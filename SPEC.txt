@@ -1,0 +1,38 @@
+===== Instruction Set =====
+nop                 : No operation
+mov <reg> <reg/imm> : Load <reg/imm> into <reg>
+stb <reg/imm> <reg> : Store <reg> into RAM at <reg/imm>
+ldb <reg> <reg/imm> : Load from RAM at <reg/imm> into <reg>
+push <reg/imm>      : Push <reg/imm> onto the stack
+pop <reg>           : Pop from the stack into <reg>
+add <reg> <reg/imm> : Add <reg> and <reg/imm> together
+sub <reg> <reg/imm> : Subtract <reg/imm> from <reg>
+mul <reg> <reg/imm> : Multiply <reg> and <reg/imm> together
+div <reg> <reg/imm> : Divide <reg/imm> into <reg>
+and <reg> <reg/imm> : Bitwise AND <reg> and <reg/imm>
+or <reg> <reg/imm>  : Bitwise OR <reg> and <reg/imm>
+not <reg>           : Bitwise AND <reg>
+xor <reg> <reg/imm> : Bitwise XOR <reg> and <reg/imm>
+cmp <reg> <reg/imm> : Subtract <reg/imm> from <reg>, but only update flags
+jmp <label/imm>     : Unconditionally jump to <label/imm>
+jz <label/imm>      : Jump to <label/imm> if the zero flag is enabled
+jc <label/imm>      : Jump to <label/imm> if the carry flag is enabled
+jn <label/imm>      : Jump to <label/imm> if the negative flag is enabled
+hlt                 : Halt the CPU
+
+*NOTE*: All ALU-based operations store the result in the first specified register
+
+===== Registers =====
+General Purpose (8-bit): a, b, c, d
+Stack Pointer (8-bit): sp
+Flags (8-bit): f
+    - Zero
+    - Carry
+    - Negative
+Program Counter (16-bit, stored in memory): pc
+
+===== Memory Layout =====
+0x0000-0x7fff: Program Memory
+0x8000-0x80ff: Stack
+0x8100-0xfffd: General Purpose
+0xfffe-0xffff: Program Counter
