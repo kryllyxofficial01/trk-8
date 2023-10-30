@@ -51,8 +51,6 @@ uint8_t stack_pop(registers_t* registers, uint8_t* memory) {
     return mem_fetch(memory, STACK_OFFSET+(++registers->stack_pointer));
 }
 
-#include <stdio.h>
-
 void update_flags(registers_t* registers, int value) {
     if (value == 0) {
         registers->flags |= 1 << ZERO_FLAG_OFFSET;
