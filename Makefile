@@ -1,13 +1,17 @@
 GXX=gcc
 GXX_FLAGS=-g
 
+ASM_SRC=$(wildcard src/assembler/*.c)
 EMU_SRC=$(wildcard src/emulator/*.c)
 
 BUILD=build
 
-all: emulate
+all: clean assemble emulate
 
-emulate: clean
+assemble:
+	$(GXX) $(GXX_FLAGS) $(ASM_SRC) -o $(BUILD)/assembler
+
+emulate:
 	$(GXX) $(GXX_FLAGS) $(EMU_SRC) -o $(BUILD)/emulator
 
 clean: mkbuild

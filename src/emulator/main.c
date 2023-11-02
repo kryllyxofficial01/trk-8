@@ -4,7 +4,7 @@
 #include "include/registers.h"
 #include "include/memory.h"
 
-int main(int argc, char const* argv[]) {
+int main(int argc, const char* argv[]) {
     registers_t registers;
     uint8_t memory[MAX_MEM_SIZE];
 
