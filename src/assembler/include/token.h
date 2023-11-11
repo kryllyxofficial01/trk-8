@@ -2,7 +2,8 @@
 #define __TOKEN_H
 
 enum token_types {
-    PNEUMONIC,
+    ID,
+    REGISTER,
     IMM8,
     ADDRESS
 };
