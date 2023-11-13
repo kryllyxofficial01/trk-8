@@ -4,8 +4,7 @@
 enum token_types {
     ID,
     REGISTER,
-    IMM8,
-    ADDRESS
+    IMM8
 };
 
 typedef struct TOKEN {
