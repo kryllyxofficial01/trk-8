@@ -3,14 +3,14 @@
 map_t* map_init() {
     map_t* map = calloc(1, sizeof(struct MAP));
 
-    map->current_index = 0;
+    map->size = 0;
 
     return map;
 }
 
 int map_get_key_index(map_t* map, char* key) {
-    for (int i = 0; i < MAX_MAP_SIZE; i++) {
-        if (strcmp(map->keys[i], key)) {
+    for (int i = 0; i < map->size; i++) {
+        if (strcmp(map->keys[i], key) == 0) {
             return i;
         }
     }
@@ -21,25 +21,23 @@ int map_get_key_index(map_t* map, char* key) {
 void map_insert(map_t* map, char* key, int value) {
     int index = map_get_key_index(map, key);
 
-    if (index >= 0) {
-        map->values[index] = value;
-    }
-    else {
-        strcpy(map->keys[map->current_index], key);
-        map->values[map->current_index] = value;
+    if (index == -1) {
+        strcpy(map->keys[map->size], key);
+        map->values[map->size] = value;
+
+        map->size++;
     }
 
-    map->current_index++;
+    map->values[index] = value;
 }
 
 int map_get(map_t* map, char* key) {
     int index = map_get_key_index(map, key);
 
-    if (index >= 0) {
-        return map->values[index];
-    }
-    else {
+    if (index == -1) {
         printf("No value assigned to key: '%s'\n", key);
         exit(-1);
     }
+
+    return map->values[index];
 }

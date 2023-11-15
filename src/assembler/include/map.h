@@ -11,7 +11,7 @@ typedef struct MAP {
     char keys[MAX_MAP_SIZE][2048];
     int values[MAX_MAP_SIZE];
 
-    int current_index;
+    int size;
 } map_t;
 
 map_t* map_init();
