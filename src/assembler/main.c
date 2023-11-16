@@ -25,9 +25,5 @@ int main(int argc, const char* argv[]) {
         i++;
     }
 
-    map_t* opcodes = assembler_get_opcodes();
-
-    printf("%u\n", map_get(opcodes, "sub_reg"));
-
     return 0;
 }
