@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "include/lexer.h"
+#include "include/assembler.h"
 #include "include/token.h"
 #include "include/utils.h"
 
@@ -23,6 +24,10 @@ int main(int argc, const char* argv[]) {
 
         i++;
     }
+
+    map_t* opcodes = assembler_get_opcodes();
+
+    printf("%u\n", map_get(opcodes, "sub_reg"));
 
     return 0;
 }

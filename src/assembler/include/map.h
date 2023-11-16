@@ -16,8 +16,8 @@ typedef struct MAP {
 
 map_t* map_init();
 
-int map_get_key_index(map_t* map, char* key);
-void map_insert(map_t* map, char* key, int value);
-int map_get(map_t* map, char* key);
+int map_get_key_index(map_t* map, const char* key);
+void map_insert(map_t* map, const char* key, int value);
+int map_get(map_t* map, const char* key);
 
 #endif

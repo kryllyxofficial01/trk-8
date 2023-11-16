@@ -8,7 +8,7 @@ map_t* map_init() {
     return map;
 }
 
-int map_get_key_index(map_t* map, char* key) {
+int map_get_key_index(map_t* map, const char* key) {
     for (int i = 0; i < map->size; i++) {
         if (strcmp(map->keys[i], key) == 0) {
             return i;
@@ -18,7 +18,7 @@ int map_get_key_index(map_t* map, char* key) {
     return -1;
 }
 
-void map_insert(map_t* map, char* key, int value) {
+void map_insert(map_t* map, const char* key, int value) {
     int index = map_get_key_index(map, key);
 
     if (index == -1) {
@@ -31,7 +31,7 @@ void map_insert(map_t* map, char* key, int value) {
     map->values[index] = value;
 }
 
-int map_get(map_t* map, char* key) {
+int map_get(map_t* map, const char* key) {
     int index = map_get_key_index(map, key);
 
     if (index == -1) {
