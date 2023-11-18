@@ -22,6 +22,7 @@ int main(int argc, const char* argv[]) {
     while (lines[i] != NULL) {
         token_t* tokens = lexer_lex(lines[i]);
 
+
         i++;
     }
 

@@ -9,7 +9,7 @@ enum token_types {
 
 typedef struct TOKEN {
     enum token_types type;
-    const char* value;
+    char value[2048];
 } token_t;
 
 #endif

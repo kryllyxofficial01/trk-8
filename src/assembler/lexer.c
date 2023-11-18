@@ -6,7 +6,7 @@ token_t* lexer_lex(char* line) {
     uint8_t token_idx = 0;
     for (int i = 0; i <= strlen(line); i++) {
         if (line[i] == '@') {
-            tokens[token_idx] = lexer_get_register(line, &i);
+             tokens[token_idx] = lexer_get_register(line, &i);
         }
         else if (isdigit(line[i]) || strchr(BASE_PREFIXES, line[i])) {
             tokens[token_idx] = lexer_get_immediate(line, &i);
@@ -36,10 +36,12 @@ token_t lexer_get_id(char* line, int* index) {
 
     *index--;
 
-    return (token_t) {
-        .type = ID,
-        .value = id
-    };
+    token_t token;
+
+    token.type = ID;
+    strcpy(token.value, id);
+
+    return token;
 }
 
 token_t lexer_get_register(char* line, int* index) {
@@ -56,10 +58,12 @@ token_t lexer_get_register(char* line, int* index) {
 
     *index--;
 
-    return (token_t) {
-        .type = REGISTER,
-        .value = register_id
-    };
+    token_t token;
+
+    token.type = REGISTER;
+    strcpy(token.value, register_id);
+
+    return token;
 }
 
 token_t lexer_get_immediate(char* line, int* index) {
@@ -99,8 +103,10 @@ token_t lexer_get_immediate(char* line, int* index) {
         }
     }
 
-    return (token_t) {
-        .type = IMM8,
-        .value = immediate
-    };
+    token_t token;
+
+    token.type = IMM8;
+    strcpy(token.value, immediate);
+
+    return token;
 }
