@@ -1,6 +1,12 @@
 #ifndef __ASSEMBLER_H
 #define __ASSEMBLER_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "token.h"
+#include "utils.h"
 #include "map.h"
 
 #define PNEUMONICS (const char*[]) { \
@@ -21,8 +27,23 @@
     "cmp_reg", "cmp_imm", \
     "jmp", "jz", "jc", "jn", \
     "hlt", NULL \
-} \
+}
+
+#define REGISTERS (const char*[]) { \
+    "a", "b", "c", "d", "sp", "f", NULL \
+}
+
+#define HAS_VARIANTS (const char*[]) { \
+    "mov", "stb", "ldb", "push", \
+    "add", "sub", "mul", "div", \
+    "and", "or", "xor", "cmp", \
+    NULL \
+}
+
+char* assembler_assemble(token_t* tokens);
 
 map_t* assembler_get_opcodes();
+map_t* assembler_get_register_ids();
+map_t* assembler_get_variant_offsets();
 
 #endif

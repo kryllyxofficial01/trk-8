@@ -18,7 +18,7 @@ char* to_binary(uint8_t number) {
 
 // Credit: https://stackoverflow.com/a/7459271
 void strins(char* destination, const char* source, int position) {
-    char buffer[2048] = {};
+    char buffer[MAX_STRING_SIZE] = {};
     strncpy(buffer, destination, position);
 
     int length = strlen(buffer);
@@ -28,4 +28,17 @@ void strins(char* destination, const char* source, int position) {
     strcpy(buffer + length, destination + position);
 
     strcpy(destination, buffer);
+}
+
+bool is_str_contained(const char** array, const char* string) {
+    int i = 0;
+    while (array[i] != NULL) {
+        if (strcmp(array[i], string) == 0) {
+            return true;
+        }
+
+        i++;
+    }
+
+    return false;
 }

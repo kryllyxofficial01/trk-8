@@ -5,10 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "utils.h"
+
 #define MAX_MAP_SIZE 100
 
 typedef struct MAP {
-    char keys[MAX_MAP_SIZE][2048];
+    char keys[MAX_MAP_SIZE][MAX_STRING_SIZE];
     int values[MAX_MAP_SIZE];
 
     int size;

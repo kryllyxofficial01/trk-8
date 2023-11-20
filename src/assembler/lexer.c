@@ -21,11 +21,18 @@ token_t* lexer_lex(char* line) {
         token_idx++;
     }
 
+    token_t eol_token;
+
+    eol_token.type = EOL;
+    strcpy(eol_token.value, "\0");
+
+    tokens[token_idx] = eol_token;
+
     return tokens;
 }
 
 token_t lexer_get_id(char* line, int* index) {
-    char id[2048];
+    char id[MAX_STRING_SIZE];
 
     uint16_t i = 0;
     while (isalnum(line[*index])) {
@@ -69,7 +76,7 @@ token_t lexer_get_register(char* line, int* index) {
 token_t lexer_get_immediate(char* line, int* index) {
     char immediate[8];
 
-    char number[2048];
+    char number[MAX_STRING_SIZE];
     int i = 0;
     if (isdigit(line[*index])) {
         while (isdigit(line[*index])) {

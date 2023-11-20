@@ -11,7 +11,7 @@ int main(int argc, const char* argv[]) {
 
     char* lines[PRGM_MEM_SIZE];
 
-    char line[2048];
+    char line[MAX_STRING_SIZE];
     uint16_t i = 0;
     while (fgets(line, sizeof(line), file)) {
         lines[i++] = line;
@@ -22,6 +22,7 @@ int main(int argc, const char* argv[]) {
     while (lines[i] != NULL) {
         token_t* tokens = lexer_lex(lines[i]);
 
+        char* binary = assembler_assemble(tokens);
 
         i++;
     }
