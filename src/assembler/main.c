@@ -18,14 +18,24 @@ int main(int argc, const char* argv[]) {
     }
     lines[i] = 0;
 
+    fclose(file);
+
+    char* bin_file_path = argv[1];
+    strcat(bin_file_path, ".bin");
+
+    FILE* bin_file = fopen(bin_file_path, "w");
+
     i = 0;
     while (lines[i] != NULL) {
         token_t* tokens = lexer_lex(lines[i]);
-
         char* binary = assembler_assemble(tokens);
+
+        fprintf(bin_file, "%s", binary);
 
         i++;
     }
+
+    fclose(bin_file);
 
     return 0;
 }

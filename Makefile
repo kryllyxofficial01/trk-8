@@ -1,5 +1,5 @@
 GXX=gcc
-GXX_FLAGS=-g
+GXX_FLAGS=-g -Wno-discarded-qualifiers
 
 ASM_SRC=$(wildcard src/assembler/*.c)
 EMU_SRC=$(wildcard src/emulator/*.c)
