@@ -14,14 +14,16 @@ int main(int argc, const char* argv[]) {
     char line[MAX_STRING_SIZE];
     int instruction_idx = 0;
     while (fgets(line, sizeof(line), file)) {
-        if (str_ends_with(line, "\r\n")) {
-            strcpy(line, strtok(line, "\r\n"));
+        if (strcmp(line, "\r\n") && line[0] != ';') {
+            if (str_ends_with(line, "\r\n")) {
+                strcpy(line, strtok(line, "\r\n"));
+            }
+
+            lines[instruction_idx] = malloc(MAX_STRING_SIZE);
+            strcpy(lines[instruction_idx], line);
+
+            instruction_idx++;
         }
-
-        lines[instruction_idx] = malloc(MAX_STRING_SIZE);
-        strcpy(lines[instruction_idx], line);
-
-        instruction_idx++;
     }
     lines[instruction_idx] = NULL;
 
