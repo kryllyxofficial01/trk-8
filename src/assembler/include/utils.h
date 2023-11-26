@@ -10,9 +10,11 @@
 
 #define PRGM_MEM_SIZE 0x8000
 #define MAX_STRING_SIZE 2048
+#define BLOCK_SIZE 1024
 
 char* to_binary(uint8_t number);
 void strins(char* destination, const char* source, int position);
 bool is_str_contained(const char** array, const char* string);
+bool str_ends_with(const char* string, const char* substring);
 
 #endif

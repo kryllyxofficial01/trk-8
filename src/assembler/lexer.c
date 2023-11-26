@@ -4,21 +4,20 @@ token_t* lexer_lex(char* line) {
     token_t* tokens = malloc(sizeof(struct TOKEN) * MAX_TOKENS);
 
     uint8_t token_idx = 0;
-    for (int i = 0; i <= strlen(line); i++) {
-        if (line[i] == '@') {
-             tokens[token_idx] = lexer_get_register(line, &i);
-        }
-        else if (isdigit(line[i]) || strchr(BASE_PREFIXES, line[i])) {
-            tokens[token_idx] = lexer_get_immediate(line, &i);
-        }
-        else if (!isspace(line[i])) {
-            tokens[token_idx] = lexer_get_id(line, &i);
-        }
-        else {
-            token_idx--;
-        }
+    for (int i = 0; i < strlen(line); i++) {
+        if (!isspace(line[i])) {
+            if (line[i] == '@') {
+                tokens[token_idx] = lexer_get_register(line, &i);
+            }
+            else if (isdigit(line[i]) || strchr(BASE_PREFIXES, line[i])) {
+                tokens[token_idx] = lexer_get_immediate(line, &i);
+            }
+            else {
+                tokens[token_idx] = lexer_get_id(line, &i);
+            }
 
-        token_idx++;
+            token_idx++;
+        }
     }
 
     token_t eol_token;
@@ -32,18 +31,16 @@ token_t* lexer_lex(char* line) {
 }
 
 token_t lexer_get_id(char* line, int* index) {
-    char id[MAX_STRING_SIZE];
+    token_t token;
 
-    uint16_t i = 0;
+    char id[MAX_STRING_SIZE] = "";
     while (isalnum(line[*index])) {
-        id[i] = line[(*index)++];
+        strncat(id, &line[*index], 1);
 
-        i++;
+        (*index)++;
     }
 
     *index--;
-
-    token_t token;
 
     token.type = ID;
     strcpy(token.value, id);
@@ -52,20 +49,18 @@ token_t lexer_get_id(char* line, int* index) {
 }
 
 token_t lexer_get_register(char* line, int* index) {
-    char register_id[5];
+    token_t token;
 
     (*index)++;
 
-    uint16_t i = 0;
+    char register_id[MAX_STRING_SIZE] = "";
     while (isalnum(line[*index])) {
-        register_id[i] = line[(*index)++];
+        strncat(register_id, &line[*index], 1);
 
-        i++;
+        (*index)++;
     }
 
     *index--;
-
-    token_t token;
 
     token.type = REGISTER;
     strcpy(token.value, register_id);
@@ -74,46 +69,47 @@ token_t lexer_get_register(char* line, int* index) {
 }
 
 token_t lexer_get_immediate(char* line, int* index) {
-    char immediate[8];
+    token_t token;
 
-    char number[MAX_STRING_SIZE];
-    int i = 0;
+    char* binary = "";
+
+    char number[MAX_STRING_SIZE] = "";
     if (isdigit(line[*index])) {
         while (isdigit(line[*index])) {
-            number[i] = line[(*index)++];
+            strncat(number, &line[*index], 1);
 
-            i++;
+            (*index)++;
         }
 
-        strcpy(immediate, to_binary(atoi(number)));
+        binary = to_binary(atoi(number));
     }
     else if (strchr(BASE_PREFIXES, line[*index])) {
         (*index)++;
 
-        if (line[*index-1] == '%') {
+        if (line[*index - 1] == '%') {
             while (strchr(VALID_BIN, line[*index])) {
-                number[i] = line[(*index)++];
+                strncat(number, &line[*index], 1);
 
-                i++;
+                (*index)++;
             }
 
-            strcpy(immediate, number);
+            binary = to_binary(strtol(number, NULL, 2));
         }
-        else if (line[*index-1] == '#') {
-            while (strchr(VALID_HEX, tolower(line[*index]))) {
-                number[i] = line[(*index)++];
+        else if (line[*index - 1] == '#') {
+            while (isxdigit(line[*index])) {
+                strncat(number, &line[*index], 1);
 
-                i++;
+                (*index)++;
             }
 
-            strcpy(immediate, to_binary(strtol(number, NULL, 16)));
+            binary = to_binary(strtol(number, NULL, 16));
         }
     }
 
-    token_t token;
+    *index--;
 
     token.type = IMM8;
-    strcpy(token.value, immediate);
+    strcpy(token.value, binary);
 
     return token;
 }

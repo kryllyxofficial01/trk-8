@@ -12,11 +12,18 @@ int main(int argc, const char* argv[]) {
     char* lines[PRGM_MEM_SIZE];
 
     char line[MAX_STRING_SIZE];
-    uint16_t i = 0;
+    int instruction_idx = 0;
     while (fgets(line, sizeof(line), file)) {
-        lines[i++] = line;
+        if (str_ends_with(line, "\r\n")) {
+            strcpy(line, strtok(line, "\r\n"));
+        }
+
+        lines[instruction_idx] = malloc(MAX_STRING_SIZE);
+        strcpy(lines[instruction_idx], line);
+
+        instruction_idx++;
     }
-    lines[i] = 0;
+    lines[instruction_idx] = NULL;
 
     fclose(file);
 
@@ -25,17 +32,18 @@ int main(int argc, const char* argv[]) {
 
     FILE* bin_file = fopen(bin_file_path, "w");
 
-    i = 0;
-    while (lines[i] != NULL) {
-        token_t* tokens = lexer_lex(lines[i]);
+    for (int idx = 0; idx < instruction_idx; idx++) {
+        token_t* tokens = lexer_lex(lines[idx]);
         char* binary = assembler_assemble(tokens);
 
         fprintf(bin_file, "%s", binary);
-
-        i++;
     }
 
     fclose(bin_file);
+
+    for (int i = 0; i < instruction_idx; i++) {
+        free(lines[i]);
+    }
 
     return 0;
 }

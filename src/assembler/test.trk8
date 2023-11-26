@@ -1,1 +1,6 @@
-mov @a 19
+mov @a %00010011
+mov @b #17
+push @a
+mul @a @b
+pop @c
+add @c @a

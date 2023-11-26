@@ -1,7 +1,7 @@
 #include "include/assembler.h"
 
 char* assembler_assemble(token_t* tokens) {
-    char* binary = malloc(sizeof(char) * MAX_STRING_SIZE);
+    char* binary = calloc(sizeof(char) * MAX_STRING_SIZE, 1);
 
     int i = 0;
     char* bin;
@@ -89,6 +89,8 @@ map_t* assembler_get_variant_offsets() {
 
     map_insert(variant_offsets, "stb", 1);
     map_insert(variant_offsets, "ldb", 2);
+
+    map_insert(variant_offsets, "push", 1);
 
     map_insert(variant_offsets, "add", 2);
     map_insert(variant_offsets, "sub", 2);
