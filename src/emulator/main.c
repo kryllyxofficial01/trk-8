@@ -13,7 +13,7 @@ int main(int argc, const char* argv[]) {
 
     char* binary[(PRGM_MEM_END + 1) * 8];
 
-    char line[2048];
+    char line[MAX_STRING_SIZE];
     int instruction_idx = 0;
     while (fgets(line, sizeof(line), file)) {
         if (str_ends_with(line, "\n")) {
