@@ -1,11 +1,4 @@
-; initialize values
-mov @a %00010011
-mov @b #17
+mov @a 18
+mov @b 2
 
-push @a
-
-mul @a @b
-
-pop @c
-
-add @c @a
+div @a @b

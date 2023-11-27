@@ -13,6 +13,10 @@ void mem_init(uint8_t* memory, char** binary) {
 
         i++;
     }
+
+    if (i < PRGM_MEM_END) {
+        memory[i] = 255; // EOF
+    }
 }
 
 uint8_t mem_fetch(uint8_t* memory, uint16_t address) {

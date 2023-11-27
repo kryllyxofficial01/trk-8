@@ -25,7 +25,8 @@ enum instructions {
     XOR_REG, XOR_IMM,
     CMP_REG, CMP_IMM,
     JMP, JZ, JC, JN,
-    HLT
+    HLT,
+    ASM_EOF = 255
 };
 
 void cpu_run_program(registers_t* registers, uint8_t* memory);
