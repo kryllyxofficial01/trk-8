@@ -37,7 +37,5 @@ int main(int argc, const char* argv[]) {
 
     cpu_run_program(&registers, memory);
 
-    printf("%i\n", registers.general_purpose.a);
-
     return 0;
 }
