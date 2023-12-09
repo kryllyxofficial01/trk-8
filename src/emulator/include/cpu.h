@@ -11,8 +11,9 @@
 enum instructions {
     NOP,
     MOV_REG, MOV_IMM,
-    STB_REG, STB_IMM,
-    LDB_REG, LDB_IMM,
+    LDA_REG, LDA_IMM,
+    STB,
+    LDB,
     PUSH_REG, PUSH_IMM,
     POP,
     ADD_REG, ADD_IMM,
@@ -29,12 +30,21 @@ enum instructions {
     ASM_EOF = 255
 };
 
+#define REGA 0
+#define REGB 1
+#define REGC 2
+#define REGD 3
+#define REGSP 4
+#define REGF 5
+
 void cpu_run_program(registers_t* registers, uint8_t* memory);
 
 void cpu_mov(registers_t* registers, uint8_t* memory, uint8_t variant);
 
-void cpu_stb(registers_t* registers, uint8_t* memory, uint8_t variant);
-void cpu_ldb(registers_t* registers, uint8_t* memory, uint8_t variant);
+void cpu_lda(registers_t* registers, uint8_t* memory, uint8_t variant);
+
+void cpu_stb(registers_t* registers, uint8_t* memory);
+void cpu_ldb(registers_t* registers, uint8_t* memory);
 
 void cpu_push(registers_t* registers, uint8_t* memory, uint8_t variant);
 void cpu_pop(registers_t* registers, uint8_t* memory);

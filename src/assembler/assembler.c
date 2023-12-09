@@ -15,7 +15,8 @@ char* assembler_assemble(token_t* tokens) {
                 int offset = map_get(variant_offsets, tokens[i].value);
                 switch (tokens[i + offset].type) {
                     case REGISTER: strcat(mnemonic, "_reg"); break;
-                    case IMM8: strcat(mnemonic, "_imm"); break;
+                    case IMM8:
+                    case IMM16: strcat(mnemonic, "_imm"); break;
                 }
             }
             else if (!is_str_contained(MNEMONICS, tokens[i].value)) {
@@ -40,9 +41,21 @@ char* assembler_assemble(token_t* tokens) {
         }
         else if (tokens[i].type == IMM8) {
             bin = tokens[i].value;
+
+            int missing_bits = 8 - strlen(bin);
+            for (int _i = 0; _i < missing_bits; _i++) {
+                strins(bin, "0", 0);
+            }
+
+            strins(bin, "00000000\n", 0);
         }
         else if (tokens[i].type == IMM16) {
             bin = tokens[i].value;
+
+            int missing_bits = 16 - strlen(bin);
+            for (int _i = 0; _i < missing_bits; _i++) {
+                strins(bin, "0", 0);
+            }
 
             strins(bin, "\n", 8);
         }
@@ -93,6 +106,8 @@ map_t* assembler_get_variant_offsets() {
     map_t* variant_offsets = map_init();
 
     map_insert(variant_offsets, "mov", 2);
+
+    map_insert(variant_offsets, "lda", 1);
 
     map_insert(variant_offsets, "stb", 1);
     map_insert(variant_offsets, "ldb", 2);

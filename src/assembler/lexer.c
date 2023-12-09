@@ -81,7 +81,13 @@ token_t lexer_get_immediate(char* line, int* index) {
             (*index)++;
         }
 
-        binary = to_binary(atoi(number), 8);
+        unsigned int value = atoi(number);
+
+        int length;
+        if (value <= UINT8_MAX) length = 8;
+        else if (value <= UINT16_MAX) length = 16;
+
+        binary = to_binary(value, length);
     }
     else if (strchr(BASE_PREFIXES, line[*index])) {
         (*index)++;

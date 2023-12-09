@@ -6,9 +6,7 @@ void cpu_run_program(registers_t* registers, uint8_t* memory) {
     while ((program_counter = get_pc(memory)) <= PRGM_MEM_END) {
         uint8_t opcode = mem_fetch(memory, program_counter);
 
-        if (opcode == ASM_EOF) {
-            break;
-        }
+        if (opcode == ASM_EOF) break;
 
         switch (opcode) {
             case NOP: break;
@@ -16,11 +14,11 @@ void cpu_run_program(registers_t* registers, uint8_t* memory) {
             case MOV_REG: cpu_mov(registers, memory, MOV_REG); break;
             case MOV_IMM: cpu_mov(registers, memory, MOV_IMM); break;
 
-            case STB_REG: cpu_stb(registers, memory, STB_REG); break;
-            case STB_IMM: cpu_stb(registers, memory, STB_IMM); break;
+            case LDA_REG: cpu_lda(registers, memory, LDA_REG); break;
+            case LDA_IMM: cpu_lda(registers, memory, LDA_IMM); break;
 
-            case LDB_REG: cpu_ldb(registers, memory, LDB_REG); break;
-            case LDB_IMM: cpu_ldb(registers, memory, LDB_IMM); break;
+            case STB: cpu_stb(registers, memory); break;
+            case LDB: cpu_ldb(registers, memory); break;
 
             case PUSH_REG: cpu_push(registers, memory, PUSH_REG); break;
             case PUSH_IMM: cpu_push(registers, memory, PUSH_IMM); break;
@@ -66,81 +64,65 @@ void cpu_run_program(registers_t* registers, uint8_t* memory) {
 }
 
 void cpu_mov(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t destination = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t source = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t destination = mem_fetch(memory, get_pc(memory) + 1);
 
     uint8_t value;
+    int offset;
     if (variant == MOV_REG) {
-        value = get_register(registers, source);
+        value = get_register(
+            registers,
+            mem_fetch(memory, get_pc(memory) + 2)
+        );
+
+        offset = 2;
     }
     else if (variant == MOV_IMM) {
-        value = source;
+        value = mem_fetch(memory, get_pc(memory) + 3);
+
+        offset = 3;
     }
 
     update_register(registers, destination, value);
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
-void cpu_stb(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    size_t offset;
+void cpu_lda(registers_t* registers, uint8_t* memory, uint8_t variant) {
+    uint8_t address_high = mem_fetch(memory, get_pc(memory) + 1);
+    uint8_t address_low = mem_fetch(memory, get_pc(memory) + 2);
 
-    if (variant == STB_REG) {
-        uint8_t destination = mem_fetch(memory, get_pc(memory)+1);
-        uint8_t source = mem_fetch(memory, get_pc(memory)+2);
+    update_register(registers, REGA, address_high);
+    update_register(registers, REGB, address_low);
 
-        uint8_t address = get_register(registers, destination);
-        memory[address] = get_register(registers, source);
-
-        offset = 2;
-    }
-    else if (variant == STB_IMM) {
-        uint8_t destination_high = mem_fetch(memory, get_pc(memory)+1);
-        uint8_t destination_low = mem_fetch(memory, get_pc(memory)+2);
-        uint8_t source = mem_fetch(memory, get_pc(memory)+3);
-
-        uint16_t destination = destination_low | (
-            destination_high << 8
-        );
-
-        memory[destination] = get_register(registers, source);
-
-        offset = 3;
-    }
-
-    update_pc(memory, get_pc(memory)+offset);
+    update_pc(memory, get_pc(memory) + 2);
 }
 
-void cpu_ldb(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    size_t offset;
+void cpu_stb(registers_t* registers, uint8_t* memory) {
+    uint8_t source = mem_fetch(memory, get_pc(memory) + 1);
 
-    uint8_t destination = mem_fetch(memory, get_pc(memory)+1);
-    if (variant == LDB_REG) {
-        uint8_t source = mem_fetch(memory, get_pc(memory)+2);
+    uint16_t address = registers->general_purpose.b | (
+        registers->general_purpose.a << 8
+    );
 
-        uint8_t address = get_register(registers, source);
-        update_register(registers, destination, memory[address]);
+    memory[address] = get_register(registers, source);
 
-        offset = 2;
-    }
-    else if (variant == LDB_IMM) {
-        uint8_t source_high = mem_fetch(memory, get_pc(memory)+2);
-        uint8_t source_low = mem_fetch(memory, get_pc(memory)+3);
+    update_pc(memory, get_pc(memory) + 1);
+}
 
-        uint16_t source = source_low | (
-            source_high << 8
-        );
+void cpu_ldb(registers_t* registers, uint8_t* memory) {
+    uint8_t destination = mem_fetch(memory, get_pc(memory) + 1);
 
-        update_register(registers, destination, memory[source]);
+    uint16_t address = registers->general_purpose.b | (
+        registers->general_purpose.a << 8
+    );
 
-        offset = 3;
-    }
+    update_register(registers, destination, memory[address]);
 
-    update_pc(memory, get_pc(memory)+offset);
+    update_pc(memory, get_pc(memory) + 1);
 }
 
 void cpu_push(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t source = mem_fetch(memory, get_pc(memory)+1);
+    uint8_t source = mem_fetch(memory, get_pc(memory) + 1);
 
     uint8_t value;
     if (variant == PUSH_REG) {
@@ -153,160 +135,190 @@ void cpu_push(registers_t* registers, uint8_t* memory, uint8_t variant) {
 
     stack_push(registers, memory, value);
 
-    update_pc(memory, get_pc(memory)+1);
+    update_pc(memory, get_pc(memory) + 1);
 }
 
 void cpu_pop(registers_t* registers, uint8_t* memory) {
-    uint8_t destination = mem_fetch(memory, get_pc(memory)+1);
+    uint8_t destination = mem_fetch(memory, get_pc(memory) + 1);
 
     update_register(
         registers, destination,
         stack_pop(registers, memory)
     );
 
-    update_pc(memory, get_pc(memory)+1);
+    update_pc(memory, get_pc(memory) + 1);
 }
 
 void cpu_add(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == ADD_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value += operandY_val;
+        value += get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == ADD_IMM) {
-        value += operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value += operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_sub(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == SUB_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value -= operandY_val;
+        value -= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == SUB_IMM) {
-        value -= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value -= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_mul(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == MUL_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value *= operandY_val;
+        value *= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == MUL_IMM) {
-        value *= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value *= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_div(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == DIV_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value /= operandY_val;
+        value /= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == DIV_IMM) {
-        value /= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value /= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_and(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == AND_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value &= operandY_val;
+        value &= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == AND_IMM) {
-        value &= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value &= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_or(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == OR_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value |= operandY_val;
+        value |= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == OR_IMM) {
-        value |= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value |= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_not(registers_t* registers, uint8_t* memory) {
-    uint8_t operand = mem_fetch(memory, get_pc(memory)+1);
+    uint8_t operand = mem_fetch(memory, get_pc(memory) + 1);
 
     int value = ~get_register(registers, operand);
 
@@ -316,82 +328,97 @@ void cpu_not(registers_t* registers, uint8_t* memory) {
         (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+1);
+    update_pc(memory, get_pc(memory) + 1);
 }
 
 void cpu_xor(registers_t* registers, uint8_t* memory, uint8_t variant) {
-    uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == XOR_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value ^= operandY_val;
+        value ^= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == XOR_IMM) {
-        value ^= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value ^= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
     update_register(
-        registers, operandX,
-        (uint8_t)value
+        registers, operand_x, (uint8_t)value
     );
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_cmp(registers_t* registers, uint8_t* memory, uint8_t variant) {
-   uint8_t operandX = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t operandY = mem_fetch(memory, get_pc(memory)+2);
+    uint8_t operand_x = mem_fetch(memory, get_pc(memory) + 1);
 
-    int value = get_register(registers, operandX);
+    int value = get_register(registers, operand_x);
+    int offset;
     if (variant == CMP_REG) {
-        uint8_t operandY_val = get_register(registers, operandY);
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 2);
 
-        value -= operandY_val;
+        value -= get_register(registers, operand_y);
+
+        offset = 2;
     }
     else if (variant == CMP_IMM) {
-        value -= operandY;
+        uint8_t operand_y = mem_fetch(memory, get_pc(memory) + 3);
+
+        value -= operand_y;
+
+        offset = 3;
     }
 
     update_flags(registers, value);
 
-    update_pc(memory, get_pc(memory)+2);
+    update_pc(memory, get_pc(memory) + offset);
 }
 
 void cpu_jmp(registers_t* registers, uint8_t* memory) {
-    uint8_t address_high = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t address_low = mem_fetch(memory, get_pc(memory)+2);
+    uint16_t address = registers->general_purpose.b | (
+        registers->general_purpose.a << 8
+    );
 
-    update_pc(memory, (address_low | (address_high << 8))-1);
+    update_pc(memory, address - 1);
 }
 
 void cpu_jz(registers_t* registers, uint8_t* memory) {
-    uint8_t address_high = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t address_low = mem_fetch(memory, get_pc(memory)+2);
+    uint16_t address = registers->general_purpose.b | (
+        registers->general_purpose.a << 8
+    );
 
     if ((registers->flags >> ZERO_FLAG_OFFSET) & 1) {
-        update_pc(memory, (address_low | (address_high << 8))-1);
+        update_pc(memory, address - 1);
     }
 }
 
 void cpu_jc(registers_t* registers, uint8_t* memory) {
-    uint8_t address_high = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t address_low = mem_fetch(memory, get_pc(memory)+2);
+    uint16_t address = registers->general_purpose.b | (
+        registers->general_purpose.a << 8
+    );
 
     if ((registers->flags >> CARRY_FLAG_OFFSET) & 1) {
-        update_pc(memory, (address_low | (address_high << 8))-1);
+        update_pc(memory, address - 1);
     }
 }
 
 void cpu_jn(registers_t* registers, uint8_t* memory) {
-    uint8_t address_high = mem_fetch(memory, get_pc(memory)+1);
-    uint8_t address_low = mem_fetch(memory, get_pc(memory)+2);
+    uint16_t address = registers->general_purpose.b | (
+        registers->general_purpose.a << 8
+    );
 
     if ((registers->flags >> NEGATIVE_FLAG_OFFSET) & 1) {
-        update_pc(memory, (address_low | (address_high << 8))-1);
+        update_pc(memory, address - 1);
     }
 }
 

@@ -1,25 +1,25 @@
 ===== Instruction Set =====
-nop                  : No operation
-mov <reg> <reg/imm8> : Load <reg/imm8> into <reg>
-lda <label/imm16>    : Load either the memory location of <label> or value of <imm16> in AB
-stb <reg>            : Store <reg> into RAM at the address in AB
-ldb <reg>            : Load from RAM at the address in AB into <reg>
-push <reg/imm8>      : Push <reg/imm8> onto the stack
-pop <reg>            : Pop from the stack into <reg>
-add <reg> <reg/imm8> : Add <reg> and <reg/imm8> together
-sub <reg> <reg/imm8> : Subtract <reg/imm8> from <reg>
-mul <reg> <reg/imm8> : Multiply <reg> and <reg/imm8> together
-div <reg> <reg/imm8> : Divide <reg/imm8> into <reg>
-and <reg> <reg/imm8> : Bitwise AND <reg> and <reg/imm8>
-or <reg> <reg/imm8>  : Bitwise OR <reg> and <reg/imm8>
-not <reg>            : Bitwise AND <reg>
-xor <reg> <reg/imm8> : Bitwise XOR <reg> and <reg/imm8>
-cmp <reg> <reg/imm8> : Subtract <reg/imm8> from <reg>, but only update flags
-jmp <reg/imm8>       : Unconditionally jump to <label/imm8>
-jz                   : Jump to the address in AB if the zero flag is set
-jc                   : Jump to the address in AB if the carry flag is set
-jn                   : Jump to the address in AB if the negative flag is set
-hlt                  : Halt the CPU
+nop                   : No operation
+mov <reg> <reg/imm8>  : Load <reg/imm8> into <reg>
+lda <label/reg/imm16> : Load either the memory location of <label> or <reg/imm> in AB
+stb <reg>             : Store <reg> into RAM at the address in AB
+ldb <reg>             : Load from RAM at the address in AB into <reg>
+push <reg/imm8>       : Push <reg/imm8> onto the stack
+pop <reg>             : Pop from the stack into <reg>
+add <reg> <reg/imm8>  : Add <reg> and <reg/imm8> together
+sub <reg> <reg/imm8>  : Subtract <reg/imm8> from <reg>
+mul <reg> <reg/imm8>  : Multiply <reg> and <reg/imm8> together
+div <reg> <reg/imm8>  : Divide <reg/imm8> into <reg>
+and <reg> <reg/imm8>  : Bitwise AND <reg> and <reg/imm8>
+or <reg> <reg/imm8>   : Bitwise OR <reg> and <reg/imm8>
+not <reg>             : Bitwise AND <reg>
+xor <reg> <reg/imm8>  : Bitwise XOR <reg> and <reg/imm8>
+cmp <reg> <reg/imm8>  : Subtract <reg/imm8> from <reg>, but only update flags
+jmp                   : Unconditionally jump to the address in AB
+jz                    : Jump to the address in AB if the zero flag is set
+jc                    : Jump to the address in AB if the carry flag is set
+jn                    : Jump to the address in AB if the negative flag is set
+hlt                   : Halt the CPU
 
 *NOTES*:
 - All ALU-based operations store the result in the first specified register

@@ -12,9 +12,9 @@
 #define MNEMONICS (const char*[]) { \
     "nop", \
     "mov_reg", "mov_imm", \
-    "lda", \
-    "stb_reg", "stb_imm", \
-    "ldb_reg", "ldb_imm", \
+    "lda_reg", "lda_imm", \
+    "stb", \
+    "ldb", \
     "push_reg", "push_imm", \
     "pop", \
     "add_reg", "add_imm", \
@@ -35,10 +35,9 @@
 }
 
 #define HAS_VARIANTS (const char*[]) { \
-    "mov", "stb", "ldb", "push", \
+    "mov", "lda", "ldb", "push", \
     "add", "sub", "mul", "div", \
-    "and", "or", "xor", "cmp", \
-    NULL \
+    "and", "or", "xor", "cmp", NULL \
 }
 
 char* assembler_assemble(token_t* tokens);

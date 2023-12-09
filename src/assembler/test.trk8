@@ -1,3 +1,9 @@
-mov @a 19
+add @c 0
 
-lda #eaeb
+lda 12
+
+jz
+
+add @c 17
+
+add @c 19
