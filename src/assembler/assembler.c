@@ -23,14 +23,14 @@ char* assembler_assemble(token_t* tokens) {
                 exit(-1);
             }
 
-            bin = to_binary(map_get(opcodes, mnemonic));
+            bin = to_binary(map_get(opcodes, mnemonic), 8);
         }
         else if (tokens[i].type == REGISTER) {
             map_t* register_ids = assembler_get_register_ids();
 
             if (is_str_contained(REGISTERS, tokens[i].value)) {
                 bin = to_binary(
-                    map_get(register_ids, tokens[i].value)
+                    map_get(register_ids, tokens[i].value), 8
                 );
             }
             else {
@@ -41,10 +41,17 @@ char* assembler_assemble(token_t* tokens) {
         else if (tokens[i].type == IMM8) {
             bin = tokens[i].value;
         }
+        else if (tokens[i].type == IMM16) {
+            bin = tokens[i].value;
 
-        int missing_bits = 8 - strlen(bin);
-        for (int _i = 0; _i < missing_bits; _i++) {
-            strins(bin, "0", 0);
+            strins(bin, "\n", 8);
+        }
+
+        if (strlen(bin) < 8) {
+            int missing_bits = 8 - strlen(bin);
+            for (int _i = 0; _i < missing_bits; _i++) {
+                strins(bin, "0", 0);
+            }
         }
 
         strcat(binary, bin);

@@ -13,7 +13,7 @@
 #define MAX_STRING_SIZE 2048
 #define BLOCK_SIZE 1024
 
-char* to_binary(uint8_t number);
+char* to_binary(unsigned int number, int length);
 bool is_str_contained(const char** array, const char* string);
 bool str_ends_with(const char* string, const char* substring);
 

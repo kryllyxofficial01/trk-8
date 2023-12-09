@@ -9,6 +9,7 @@ enum token_types {
     ID,
     REGISTER,
     IMM8,
+    IMM16,
     EOL
 };
 

@@ -12,6 +12,7 @@
 #define MNEMONICS (const char*[]) { \
     "nop", \
     "mov_reg", "mov_imm", \
+    "lda", \
     "stb_reg", "stb_imm", \
     "ldb_reg", "ldb_imm", \
     "push_reg", "push_imm", \

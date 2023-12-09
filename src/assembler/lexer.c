@@ -81,7 +81,7 @@ token_t lexer_get_immediate(char* line, int* index) {
             (*index)++;
         }
 
-        binary = to_binary(atoi(number));
+        binary = to_binary(atoi(number), 8);
     }
     else if (strchr(BASE_PREFIXES, line[*index])) {
         (*index)++;
@@ -93,7 +93,7 @@ token_t lexer_get_immediate(char* line, int* index) {
                 (*index)++;
             }
 
-            binary = to_binary(strtol(number, NULL, 2));
+            binary = to_binary(strtol(number, NULL, 2), 8);
         }
         else if (line[*index - 1] == '#') {
             while (isxdigit(line[*index])) {
@@ -102,13 +102,21 @@ token_t lexer_get_immediate(char* line, int* index) {
                 (*index)++;
             }
 
-            binary = to_binary(strtol(number, NULL, 16));
+            unsigned int value = strtol(number, NULL, 16);
+
+            int length;
+            if (value <= UINT8_MAX) length = 8;
+            else if (value <= UINT16_MAX) length = 16;
+
+            binary = to_binary(value, length);
         }
     }
 
     *index--;
 
-    token.type = IMM8;
+    if (strlen(binary) <= 8) token.type = IMM8;
+    else if (strlen(binary) <= 16) token.type = IMM16;
+
     strcpy(token.value, binary);
 
     return token;

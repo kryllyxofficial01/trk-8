@@ -1,12 +1,12 @@
 #include "include/utils.h"
 
 // Credit: https://cs.stackexchange.com/a/10321
-char* to_binary(uint8_t number) {
-    char* binary = malloc(sizeof(char) * 8);
+char* to_binary(unsigned int number, int length) {
+    char* binary = malloc(sizeof(char) * length);
     binary[0] = '\0'; // thank you matthias
 
     while (number > 0) {
-        char num_str[8];
+        char num_str[length];
         sprintf(num_str, "%u", number % 2);
 
         strins(binary, num_str, 0);
