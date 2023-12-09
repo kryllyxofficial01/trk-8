@@ -1,7 +1,7 @@
 ===== Instruction Set =====
 nop                  : No operation
 mov <reg> <reg/imm8> : Load <reg/imm8> into <reg>
-lda <label/imm16>    : Load either the location of <label> in memory or <imm16> in AB
+lda <label/imm16>    : Load either the memory location of <label> or value of <imm16> in AB
 stb <reg>            : Store <reg> into RAM at the address in AB
 ldb <reg>            : Load from RAM at the address in AB into <reg>
 push <reg/imm8>      : Push <reg/imm8> onto the stack
@@ -16,9 +16,9 @@ not <reg>            : Bitwise AND <reg>
 xor <reg> <reg/imm8> : Bitwise XOR <reg> and <reg/imm8>
 cmp <reg> <reg/imm8> : Subtract <reg/imm8> from <reg>, but only update flags
 jmp <reg/imm8>       : Unconditionally jump to <label/imm8>
-jz <reg/imm8>        : Jump to the address in AB if <reg/imm8> sets the zero flag
-jc <reg/imm8>        : Jump to the address in AB if <reg/imm8> sets the carry flag
-jn <reg/imm8>        : Jump to the address in AB if <reg/imm8> sets the negative flag
+jz                   : Jump to the address in AB if the zero flag is set
+jc                   : Jump to the address in AB if the carry flag is set
+jn                   : Jump to the address in AB if the negative flag is set
 hlt                  : Halt the CPU
 
 *NOTES*:

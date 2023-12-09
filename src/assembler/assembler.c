@@ -10,20 +10,20 @@ char* assembler_assemble(token_t* tokens) {
             map_t* opcodes = assembler_get_opcodes();
             map_t* variant_offsets = assembler_get_variant_offsets();
 
-            char* pneumonic = tokens[i].value;
+            char* mnemonic = tokens[i].value;
             if (is_str_contained(HAS_VARIANTS, tokens[i].value)) {
                 int offset = map_get(variant_offsets, tokens[i].value);
                 switch (tokens[i + offset].type) {
-                    case REGISTER: strcat(pneumonic, "_reg"); break;
-                    case IMM8: strcat(pneumonic, "_imm"); break;
+                    case REGISTER: strcat(mnemonic, "_reg"); break;
+                    case IMM8: strcat(mnemonic, "_imm"); break;
                 }
             }
-            else if (!is_str_contained(PNEUMONICS, tokens[i].value)) {
+            else if (!is_str_contained(MNEMONICS, tokens[i].value)) {
                 printf("Invalid instruction: '%s'\n", tokens[i].value);
                 exit(-1);
             }
 
-            bin = to_binary(map_get(opcodes, pneumonic));
+            bin = to_binary(map_get(opcodes, mnemonic));
         }
         else if (tokens[i].type == REGISTER) {
             map_t* register_ids = assembler_get_register_ids();
@@ -60,8 +60,8 @@ map_t* assembler_get_opcodes() {
     map_t* opcodes = map_init();
 
     int i = 0;
-    while (PNEUMONICS[i] != NULL) {
-        map_insert(opcodes, PNEUMONICS[i], i);
+    while (MNEMONICS[i] != NULL) {
+        map_insert(opcodes, MNEMONICS[i], i);
 
         i++;
     }

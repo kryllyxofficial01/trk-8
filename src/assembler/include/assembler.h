@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "map.h"
 
-#define PNEUMONICS (const char*[]) { \
+#define MNEMONICS (const char*[]) { \
     "nop", \
     "mov_reg", "mov_imm", \
     "stb_reg", "stb_imm", \

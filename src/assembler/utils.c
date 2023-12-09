@@ -17,19 +17,6 @@ char* to_binary(uint8_t number) {
     return binary;
 }
 
-// Credit: https://stackoverflow.com/a/7459271
-void strins(char* destination, const char* source, int position) {
-    char buffer[MAX_STRING_SIZE] = {};
-    strncpy(buffer, destination, position);
-
-    int length = strlen(buffer);
-
-    strcpy(buffer + length, source);
-    length += strlen(source);
-    strcpy(buffer + length, destination + position);
-
-    strcpy(destination, buffer);
-}
 
 bool is_str_contained(const char** array, const char* string) {
     int i = 0;
@@ -50,4 +37,18 @@ bool str_ends_with(const char* string, const char* substring) {
         string + strlen(string) - strlen(substring),
         substring, strlen(substring)
     ) == 0;
+}
+
+// Credit: https://stackoverflow.com/a/7459271
+void strins(char* destination, const char* source, int position) {
+    char buffer[MAX_STRING_SIZE] = {};
+    strncpy(buffer, destination, position);
+
+    int length = strlen(buffer);
+
+    strcpy(buffer + length, source);
+    length += strlen(source);
+    strcpy(buffer + length, destination + position);
+
+    strcpy(destination, buffer);
 }
