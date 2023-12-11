@@ -30,13 +30,6 @@ enum instructions {
     ASM_EOF = 255
 };
 
-#define REGA 0
-#define REGB 1
-#define REGC 2
-#define REGD 3
-#define REGSP 4
-#define REGF 5
-
 void cpu_run_program(registers_t* registers, uint8_t* memory);
 
 void cpu_mov(registers_t* registers, uint8_t* memory, uint8_t variant);

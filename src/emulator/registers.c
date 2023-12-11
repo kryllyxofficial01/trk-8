@@ -12,23 +12,23 @@ void reset_registers(registers_t* registers) {
 
 uint8_t get_register(registers_t* registers, uint8_t id) {
     switch (id) {
-        case A: return registers->general_purpose.a; break;
-        case B: return registers->general_purpose.b; break;
-        case C: return registers->general_purpose.c; break;
-        case D: return registers->general_purpose.d; break;
-        case SP: return registers->stack_pointer; break;
-        case F: return registers->flags; break;
+        case REGA: return registers->general_purpose.a; break;
+        case REGB: return registers->general_purpose.b; break;
+        case REGC: return registers->general_purpose.c; break;
+        case REGD: return registers->general_purpose.d; break;
+        case REGSP: return registers->stack_pointer; break;
+        case REGF: return registers->flags; break;
     }
 }
 
 void update_register(registers_t* registers, uint8_t id, uint8_t value) {
     switch (id) {
-        case A: registers->general_purpose.a = value; break;
-        case B: registers->general_purpose.b = value; break;
-        case C: registers->general_purpose.c = value; break;
-        case D: registers->general_purpose.d = value; break;
-        case SP: registers->stack_pointer = value; break;
-        case F: registers->flags = value; break;
+        case REGA: registers->general_purpose.a = value; break;
+        case REGB: registers->general_purpose.b = value; break;
+        case REGC: registers->general_purpose.c = value; break;
+        case REGD: registers->general_purpose.d = value; break;
+        case REGSP: registers->stack_pointer = value; break;
+        case REGF: registers->flags = value; break;
     }
 }
 

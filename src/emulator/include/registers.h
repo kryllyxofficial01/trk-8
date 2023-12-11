@@ -24,7 +24,7 @@ typedef struct REGISTERS {
 } registers_t;
 
 enum registers {
-    A, B, C, D, SP, F
+    REGA, REGB, REGC, REGD, REGSP, REGF
 };
 
 void reset_registers(registers_t* registers);
