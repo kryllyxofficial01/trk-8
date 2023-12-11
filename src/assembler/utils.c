@@ -52,3 +52,18 @@ void strins(char* destination, const char* source, int position) {
 
     strcpy(destination, buffer);
 }
+
+// Credit: https://linuxhint.com/remove-whitespaces-from-strings-with-strtrim-c/
+void strtrim(char* string) {
+    size_t start = 0;
+    while (isspace(string[start])) start++;
+
+    size_t end = strlen(string) - 1;
+    while (isspace(string[start])) end--;
+
+    size_t i;
+    for (i = 0; i <= end; i++) {
+        string[i] = string[start + i];
+    }
+    string[i] = '\0';
+}

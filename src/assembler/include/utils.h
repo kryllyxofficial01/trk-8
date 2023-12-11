@@ -18,4 +18,5 @@ bool is_str_contained(const char** array, const char* string);
 bool str_ends_with(const char* string, const char* substring);
 
 void strins(char* destination, const char* source, int position);
+void strtrim(char* string);
 #endif

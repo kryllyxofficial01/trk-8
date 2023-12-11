@@ -1,9 +1,7 @@
-add @c 0
+; lda [test]
 
-lda 12
+.tset
+    mov @c 17
 
-jz
-
-add @c 17
-
-add @c 19
+.test
+    add @c 19

@@ -46,4 +46,6 @@ map_t* assembler_get_opcodes();
 map_t* assembler_get_register_ids();
 map_t* assembler_get_variant_offsets();
 
+map_t* assembler_get_label_locations(char** lines);
+
 #endif

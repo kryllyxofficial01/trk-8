@@ -125,3 +125,22 @@ map_t* assembler_get_variant_offsets() {
 
     map_insert(variant_offsets, "cmp", 2);
 }
+
+map_t* assembler_get_label_locations(char** lines) {
+    map_t* label_locations = map_init();
+
+    int i = 0;
+    while (lines[i] != NULL) {
+        if (lines[i][0] == '.') {
+            char label_name[MAX_STRING_SIZE];
+
+            strncpy(label_name, lines[i] + 1, strlen(lines[i]) - 1);
+
+            map_insert(label_locations, label_name, i);
+        }
+
+        i++;
+    }
+
+    return label_locations;
+}
