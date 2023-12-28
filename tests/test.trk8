@@ -1,4 +1,6 @@
-; lda [test]
+lda [test]
+
+jmp
 
 .tset
     mov @c 17

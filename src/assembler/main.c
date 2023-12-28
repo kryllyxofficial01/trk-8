@@ -37,8 +37,6 @@ int main(int argc, const char* argv[]) {
     }
     lines[instruction_idx] = NULL;
 
-    map_t* label_locations = assembler_get_label_locations(lines);
-
     FILE* bin_file = fopen(bin_file_path, "w");
     for (int idx = 0; idx < instruction_idx; idx++) {
         token_t* tokens = lexer_lex(lines[idx]);
