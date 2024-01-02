@@ -1,9 +1,2 @@
-lda [test]
-
-jmp
-
-.tset
-    mov @c 17
-
-.test
-    add @c 19
+mov @a 19
+mov @b #17

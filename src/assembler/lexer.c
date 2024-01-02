@@ -83,6 +83,10 @@ token_t lexer_get_immediate(char* line, int* index) {
 
         unsigned int value = atoi(number);
 
+        if (value > UINT8_MAX) {
+
+        }
+
         int length;
         if (value <= UINT8_MAX) length = 8;
         else if (value <= UINT16_MAX) length = 16;

@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <linux/limits.h>
 
 #include "include/lexer.h"
 #include "include/assembler.h"
@@ -7,9 +9,15 @@
 #include "include/utils.h"
 
 int main(int argc, const char* argv[]) {
-    FILE* file = fopen(argv[1], "r");
+    char filepath[PATH_MAX];
+    if (!realpath(argv[1], filepath)) {
+        printf("\x1b[31mError: Invalid filepath '%s'\x1b[0m\n", argv[1]);
+        exit(-1);
+    }
 
-    char* bin_file_path = argv[1];
+    FILE* file = fopen(filepath, "r");
+
+    char* bin_file_path = filepath;
     strcat(bin_file_path, ".bin");
 
     char* lines[PRGM_MEM_SIZE];
@@ -38,8 +46,8 @@ int main(int argc, const char* argv[]) {
     lines[instruction_idx] = NULL;
 
     FILE* bin_file = fopen(bin_file_path, "w");
-    for (int idx = 0; idx < instruction_idx; idx++) {
-        token_t* tokens = lexer_lex(lines[idx]);
+    for (int i = 0; i < instruction_idx; i++) {
+        token_t* tokens = lexer_lex(lines[i]);
         char* binary = assembler_assemble(tokens);
 
         fprintf(bin_file, "%s", binary);
