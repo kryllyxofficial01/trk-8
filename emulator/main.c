@@ -1,5 +1,7 @@
-#include <stdio.h>
+#include "include/registers.h"
 
 int main(void) {
-    printf("test\n");
+    registers_t registers;
+
+    registers_init(&registers);
 }
