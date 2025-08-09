@@ -1,8 +1,6 @@
 #ifndef __TRK8_REGISTERS_H
 #define __TRK8_REGISTERS_H
 
-#include <stdint.h>
-
 #include "utils.h"
 
 #ifndef TRK8_NEGATIVE_FLAG_INDEX
@@ -29,10 +27,6 @@
     #define TRK8_ZERO_FLAG_INITIAL_VALUE (0b0)
 #endif
 
-#ifndef TRK8_STACK_POINTER_INITIAL_VALUE
-    #define TRK8_STACK_POINTER_INITIAL_VALUE (0xff)
-#endif
-
 #ifndef TRK8_NEGATIVE_VALUE_BIT
     #define TRK8_NEGATIVE_VALUE_BIT (7)
 #endif
@@ -41,7 +35,17 @@
     #define TRK8_CARRY_VALUE_BIT (8)
 #endif
 
-typedef unsigned char uint4_t;
+#ifndef TRK8_STACK_POINTER_INITIAL_VALUE
+    #define TRK8_STACK_POINTER_INITIAL_VALUE (0xff)
+#endif
+
+#ifndef TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE
+    #define TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE (0x81)
+#endif
+
+#ifndef TRK8_ADDRESS_REGISTER_LOW_BYTE_INITIAL_VALUE
+    #define TRK8_ADDRESS_REGISTER_LOW_BYTE_INITIAL_VALUE (0x00)
+#endif
 
 typedef struct _TRK8_REGISTERS {
     struct _REGISTERS_GENERAL_PURPOSE {
@@ -50,8 +54,13 @@ typedef struct _TRK8_REGISTERS {
 
     uint8_t stack_pointer;
 
-    uint4_t flags; // TODO: maybe use bit field?
-} registers_t;
+    struct _REGISTERS_ADDRESS {
+        uint8_t high; // ah
+        uint8_t low; // al
+    } address;
+
+    unsigned int flags : 4;
+} trk8_registers_t;
 
 typedef enum _TRK8_REGISTER_IDS {
     TRK8_REGISTER_GP_A,
@@ -59,16 +68,19 @@ typedef enum _TRK8_REGISTER_IDS {
     TRK8_REGISTER_GP_C,
     TRK8_REGISTER_GP_D,
 
-    TRK8_REGISTER_SP
+    TRK8_REGISTER_SP,
+
+    TRK8_REGISTER_ADDRESS_HIGH,
+    TRK8_REGISTER_ADDRESS_LOW
 } register_id_t;
 
-void registers_init(registers_t* registers);
+void registers_init(trk8_registers_t* registers);
 
-uint8_t registers_get(const registers_t registers, register_id_t register_id);
-void registers_set(registers_t* registers, register_id_t register_id, uint8_t value);
+uint8_t registers_get(const trk8_registers_t registers, register_id_t register_id);
+void registers_set(trk8_registers_t* registers, register_id_t register_id, uint8_t value);
 
-void registers_update_flags(registers_t* registers, uint16_t value);
+void registers_update_flags(trk8_registers_t* registers, uint16_t value);
 
-void registers_debug_print(const registers_t registers);
+void registers_debug_print(const trk8_registers_t registers);
 
 #endif

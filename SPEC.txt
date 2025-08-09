@@ -6,8 +6,8 @@ lda %i16     : Load Address [ ((ah << 8) | al) = i16 ]
 lda .label   : Load Address [ ((ah << 8) | al) = label ]
 stb %r       : Store Byte [ ((ah << 8) | al) = r ]
 ldb %r       : Load Byte [ r = ((ah << 8) | al) ]
-push %r      : Push to stack [ sp-- = r ]
-pop %r       : Pop from stack [ r = ++sp ]
+push %r      : Push to stack [ sp++ = r ]
+pop %r       : Pop from stack [ r = --sp ]
 add %r1, %r2 : Add [ r1 += r2 ]
 add %r, $i8  : Add [ r += i8 ]
 and %r1, %r2 : And [ r1 &= r2 ]
@@ -29,6 +29,8 @@ hlt          : Halt
 General Purpose (8-bit): a, b, c, d
 
 Stack Pointer* (8-bit): sp
+
+Address (8-bit): ah, al
 
 Flags** (4-bit): f -> - Z C N
                       | | | |

@@ -1,7 +1,9 @@
 #include "include/registers.h"
 
 int main(void) {
-    registers_t registers;
+    trk8_registers_t registers;
 
     registers_init(&registers);
+
+    registers_debug_print(registers);
 }
