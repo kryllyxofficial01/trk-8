@@ -2,7 +2,7 @@
 nop          : No Operation
 mov %r1, %r2 : Move [ r1 = r2 ]
 mov %r, $i8  : Move [ r = i8 ]
-lda %i16     : Load Address* [ ((ah << 8) | al) = i16 ]
+lda $i16     : Load Address* [ ((ah << 8) | al) = i16 ]
 stb %r       : Store Byte [ ((ah << 8) | al) = r ]
 ldb %r       : Load Byte [ r = ((ah << 8) | al) ]
 push %r      : Push to stack [ sp++ = r ]
