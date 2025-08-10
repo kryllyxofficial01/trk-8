@@ -30,7 +30,7 @@ General Purpose (8-bit): a, b, c, d
 
 Stack Pointer* (8-bit): sp
 
-Address (8-bit): ah, al
+Address (8-bit): al, ah
 
 Flags** (4-bit): f -> - Z C N
                       | | | |

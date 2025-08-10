@@ -39,12 +39,12 @@
     #define TRK8_STACK_POINTER_INITIAL_VALUE (0xff)
 #endif
 
-#ifndef TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE
-    #define TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE (0x81)
-#endif
-
 #ifndef TRK8_ADDRESS_REGISTER_LOW_BYTE_INITIAL_VALUE
     #define TRK8_ADDRESS_REGISTER_LOW_BYTE_INITIAL_VALUE (0x00)
+#endif
+
+#ifndef TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE
+    #define TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE (0x81)
 #endif
 
 typedef struct _TRK8_REGISTERS {
@@ -55,8 +55,8 @@ typedef struct _TRK8_REGISTERS {
     uint8_t stack_pointer;
 
     struct _REGISTERS_ADDRESS {
-        uint8_t high; // ah
         uint8_t low; // al
+        uint8_t high; // ah
     } address;
 
     unsigned int flags : 4;
@@ -70,8 +70,8 @@ typedef enum _TRK8_REGISTER_IDS {
 
     TRK8_REGISTER_SP,
 
-    TRK8_REGISTER_ADDRESS_HIGH,
-    TRK8_REGISTER_ADDRESS_LOW
+    TRK8_REGISTER_ADDRESS_LOW,
+    TRK8_REGISTER_ADDRESS_HIGH
 } register_id_t;
 
 void registers_init(trk8_registers_t* registers);
