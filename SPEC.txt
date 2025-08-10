@@ -2,8 +2,7 @@
 nop          : No Operation
 mov %r1, %r2 : Move [ r1 = r2 ]
 mov %r, $i8  : Move [ r = i8 ]
-lda %i16     : Load Address [ ((ah << 8) | al) = i16 ]
-lda .label   : Load Address [ ((ah << 8) | al) = label ]
+lda %i16     : Load Address* [ ((ah << 8) | al) = i16 ]
 stb %r       : Store Byte [ ((ah << 8) | al) = r ]
 ldb %r       : Load Byte [ r = ((ah << 8) | al) ]
 push %r      : Push to stack [ sp++ = r ]
@@ -15,15 +14,16 @@ and %r, $i8  : And [ r &= i8 ]
 or %r1, %r2  : Or [ r1 |= r2 ]
 or %r, $i8   : Or [ r |= i8 ]
 not %r       : Not [ r = ~r ]
-cmp %r1, %r2 : Compare* [ f = r1 - r2 ]
+cmp %r1, %r2 : Compare** [ f = r1 - r2 ]
 cmp %r, $i8  : Compare* [ f = r1 - i8 ]
-tsf %r, $i8  : Test for flag** [ r = f & i8 ]
+tsf %r, $i8  : Test for flag*** [ r = f & i8 ]
 jmp          : Jump [ pc = ((ah << 8) | al) ]
 jz           : Jump if Zero [ pc = ((ah << 8) | al), if f.z]
 hlt          : Halt
 
-* Updates flag register without storing the result
-** Record the state of the provided flag index
+* Any label passed will be converted to its address counterpart
+** Updates flag register without storing the result
+*** Record the state of the provided flag index
 
 ========================== Registers ==========================
 General Purpose (8-bit): a, b, c, d
