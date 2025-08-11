@@ -4,7 +4,7 @@
 #include "utils.h"
 
 #ifndef TRK8_PROGRAM_MEMORY_START
-    #define TRK8_PROGRAM_MEMORY_START (0x0)
+    #define TRK8_PROGRAM_MEMORY_START (0x0000)
 #endif
 
 #ifndef TRK8_PROGRAM_MEMORY_END
@@ -72,5 +72,7 @@ uint8_t memory_fetch_byte(const trk8_memory_t memory, const uint16_t address);
 void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint8_t data);
 
 void memory_increment_program_counter(trk8_memory_t* memory, const uint8_t amount);
+
+uint16_t memory_get_program_counter(const trk8_memory_t memory);
 
 #endif

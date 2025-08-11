@@ -10,15 +10,17 @@ void memory_init(trk8_memory_t* total_memory, uint8_t* program_memory, const uin
     }
 
     if (program_memory_length > TRK8_PROGRAM_MEMORY_LENGTH) {
+        // TODO: handle oversized program memory
         return;
     }
 
-    for (int i = 0; i < TRK8_PROGRAM_MEMORY_LENGTH; i++) {
+    for (uint16_t i = 0; i < TRK8_PROGRAM_MEMORY_LENGTH; i++) {
         total_memory->program_memory[i] = (i < program_memory_length) ? program_memory[i] : 0x0;
     }
 
-    // signify where the program ends
-    total_memory->program_memory[program_memory_length] = TRK8_PROGRAM_MEMORY_EOP_BYTE;
+    if (program_memory_length <= TRK8_PROGRAM_MEMORY_LENGTH - 1) {
+        total_memory->program_memory[program_memory_length] = TRK8_PROGRAM_MEMORY_EOP_BYTE;
+    }
 
     total_memory->program_counter[0] = TRK8_GET_LOW_BYTE(TRK8_PROGRAM_MEMORY_START);
     total_memory->program_counter[1] = TRK8_GET_HIGH_BYTE(TRK8_PROGRAM_MEMORY_START);
@@ -70,4 +72,11 @@ void memory_increment_program_counter(trk8_memory_t* memory, const uint8_t amoun
 
     memory->program_counter[0] = TRK8_GET_LOW_BYTE(pc_value);
     memory->program_counter[1] = TRK8_GET_HIGH_BYTE(pc_value);
+}
+
+uint16_t memory_get_program_counter(const trk8_memory_t memory) {
+    return TRK8_WORD(
+        memory.program_counter[1],
+        memory.program_counter[0]
+    );
 }

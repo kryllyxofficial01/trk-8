@@ -1,13 +1,15 @@
-#include "include/registers.h"
-#include "include/memory.h"
+#include "include/cpu.h"
 
 int main(void) {
-    trk8_registers_t registers;
-    trk8_memory_t memory;
+    uint8_t program[6] = { 0x14, 0x00, 0x19, 0x16, 0x01, 0x00 };
 
+    trk8_memory_t memory;
+    trk8_registers_t registers;
+
+    memory_init(&memory, program, 6);
     registers_init(&registers);
 
-    uint8_t program[1] = { 0x0 };
+    cpu_run(&memory, &registers);
 
-    memory_init(&memory, program, 1);
+    registers_debug_print(registers);
 }
