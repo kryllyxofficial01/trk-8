@@ -62,16 +62,20 @@ void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint
     }
 }
 
+void memory_set_program_counter(trk8_memory_t* memory, const uint16_t address) {
+    memory->program_counter[0] = TRK8_GET_LOW_BYTE(address);
+    memory->program_counter[1] = TRK8_GET_HIGH_BYTE(address);
+}
+
 void memory_increment_program_counter(trk8_memory_t* memory, const uint8_t amount) {
-    uint16_t pc_value = TRK8_WORD(
+    uint16_t new_pc_value = TRK8_WORD(
         memory->program_counter[1],
         memory->program_counter[0]
     );
 
-    pc_value += amount;
+    new_pc_value += amount;
 
-    memory->program_counter[0] = TRK8_GET_LOW_BYTE(pc_value);
-    memory->program_counter[1] = TRK8_GET_HIGH_BYTE(pc_value);
+    memory_set_program_counter(memory, new_pc_value);
 }
 
 uint16_t memory_get_program_counter(const trk8_memory_t memory) {

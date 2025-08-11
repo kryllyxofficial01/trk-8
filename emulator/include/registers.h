@@ -81,6 +81,4 @@ void registers_set(trk8_registers_t* registers, register_id_t register_id, uint8
 
 void registers_update_flags(trk8_registers_t* registers, uint16_t value);
 
-void registers_debug_print(const trk8_registers_t registers);
-
 #endif

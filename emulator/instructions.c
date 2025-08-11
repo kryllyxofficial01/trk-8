@@ -50,11 +50,6 @@ void trk8_lda(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
 
     registers->address.high = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
 
-    registers_update_flags(
-        registers,
-        TRK8_WORD(registers->address.high, registers->address.low)
-    );
-
     memory_increment_program_counter(memory, 1);
 }
 
@@ -326,19 +321,54 @@ void trk8_cmp(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
 }
 
 void trk8_jmp(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
-    
+    uint16_t location = TRK8_WORD(
+        registers->address.high,
+        registers->address.low
+    );
+
+    memory_set_program_counter(memory, location);
 }
 
 void trk8_jn(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    if (TRK8_BIT_CHECK(registers->flags, TRK8_NEGATIVE_FLAG_INDEX)) {
+        uint16_t location = TRK8_WORD(
+            registers->address.high,
+            registers->address.low
+        );
 
+        memory_set_program_counter(memory, location);
+    }
+    else {
+        memory_increment_program_counter(memory, 1);
+    }
 }
 
 void trk8_jc(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    if (TRK8_BIT_CHECK(registers->flags, TRK8_CARRY_FLAG_INDEX)) {
+        uint16_t location = TRK8_WORD(
+            registers->address.high,
+            registers->address.low
+        );
 
+        memory_set_program_counter(memory, location);
+    }
+    else {
+        memory_increment_program_counter(memory, 1);
+    }
 }
 
 void trk8_jz(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    if (TRK8_BIT_CHECK(registers->flags, TRK8_ZERO_FLAG_INDEX)) {
+        uint16_t location = TRK8_WORD(
+            registers->address.high,
+            registers->address.low
+        );
 
+        memory_set_program_counter(memory, location);
+    }
+    else {
+        memory_increment_program_counter(memory, 1);
+    }
 }
 
 void trk8_hlt(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {

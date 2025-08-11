@@ -71,6 +71,7 @@ void memory_init(trk8_memory_t* total_memory, uint8_t* program_memory, const uin
 uint8_t memory_fetch_byte(const trk8_memory_t memory, const uint16_t address);
 void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint8_t data);
 
+void memory_set_program_counter(trk8_memory_t* memory, const uint16_t address);
 void memory_increment_program_counter(trk8_memory_t* memory, const uint8_t amount);
 
 uint16_t memory_get_program_counter(const trk8_memory_t memory);

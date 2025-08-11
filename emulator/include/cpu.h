@@ -8,4 +8,6 @@
 
 void cpu_run(trk8_memory_t* memory, trk8_registers_t* registers);
 
+void cpu_print_state(const trk8_memory_t memory, const trk8_registers_t registers);
+
 #endif

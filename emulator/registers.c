@@ -65,18 +65,3 @@ void registers_update_flags(trk8_registers_t* registers, uint16_t value) {
         TRK8_BIT_UNSET(registers->flags, TRK8_ZERO_FLAG_INDEX);
     }
 }
-
-void registers_debug_print(const trk8_registers_t registers) {
-    printf("Register Values:\n");
-
-    printf("\tA: 0x%02x\n", registers.general_purpose.a);
-    printf("\tB: 0x%02x\n", registers.general_purpose.b);
-    printf("\tC: 0x%02x\n", registers.general_purpose.c);
-    printf("\tD: 0x%02x\n", registers.general_purpose.d);
-
-    printf("\tSP: 0x%02x\n", registers.stack_pointer);
-
-    printf("\tAddress: 0x%02x\n", TRK8_WORD(registers.address.high, registers.address.low));
-
-    printf("\tF: 0x%02x\n", registers.flags);
-}
