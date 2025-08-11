@@ -18,14 +18,14 @@
 0x5b -> not %r       : Not [ r = ~r ]
 0x64 -> cmp %r, $i8  : Compare* [ f = r1 - i8 ]
 0x66 -> cmp %r1, %r2 : Compare** [ f = r1 - r2 ]
-0x6c -> tsf %r, $i8  : Test for flag*** [ r = f & i8 ]
-0x70 -> jmp          : Jump [ pc = ((ah << 8) | al) ]
-0x78 -> jz           : Jump if Zero [ pc = ((ah << 8) | al), if f.z ]
-0x80 -> hlt          : Halt
+0x68 -> jmp          : Jump [ pc = ((ah << 8) | al) ]
+0x70 -> jn           : Jump if Negative [ pc = ((ah << 8) | al), if f.n ]
+0x78 -> jc           : Jump if Carry [ pc = ((ah << 8) | al), if f.c ]
+0x80 -> jz           : Jump if Zero [ pc = ((ah << 8) | al), if f.z ]
+0x88 -> hlt          : Halt
 
 * Any label passed will be converted to its address counterpart
 ** Updates flag register without storing the result
-*** Record the state of the provided flag index
 
 ========================== Registers ==========================
 General Purpose (8-bit): a, b, c, d

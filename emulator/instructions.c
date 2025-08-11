@@ -291,14 +291,49 @@ void trk8_not(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
 }
 
 void trk8_cmp(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    memory_increment_program_counter(memory, 1);
 
-}
+    switch (operands_type) {
+        case TRK8_OPERANDS_TYPE_REG_IMM8: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
 
-void trk8_tsf(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+            memory_increment_program_counter(memory, 1);
 
+            uint8_t right_operand_value = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+
+            registers_update_flags(registers, left_operand_value - right_operand_value);
+
+            break;
+        }
+
+        case TRK8_OPERANDS_TYPE_REG_REG: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t right_operand_value = registers_get(*registers, right_operand_id);
+
+            registers_update_flags(registers, left_operand_value - right_operand_value);
+
+            break;
+        }
+    }
+
+    memory_increment_program_counter(memory, 1);
 }
 
 void trk8_jmp(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    
+}
+
+void trk8_jn(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+
+}
+
+void trk8_jc(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
 
 }
 

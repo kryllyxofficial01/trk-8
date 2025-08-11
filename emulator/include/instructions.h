@@ -24,8 +24,9 @@
         _decl(or); \
         _decl(not); \
         _decl(cmp); \
-        _decl(tsf); \
         _decl(jmp); \
+        _decl(jn); \
+        _decl(jc); \
         _decl(jz); \
         _decl(hlt);
 #endif
