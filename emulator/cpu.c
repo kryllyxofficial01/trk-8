@@ -29,5 +29,8 @@ void cpu_run(trk8_memory_t* memory, trk8_registers_t* registers) {
             case TRK8_INSTRUCTION_JZ: trk8_jz(memory, registers, operands_type); break;
             case TRK8_INSTRUCTION_HLT: trk8_hlt(memory, registers, operands_type); break;
         }
+
+        printf("\n");
+        registers_debug_print(*registers);
     }
 }

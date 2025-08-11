@@ -1,15 +1,15 @@
 #include "include/cpu.h"
 
 int main(void) {
-    uint8_t program[10] = { 0x14, 0x00, 0x19, 0x1a, 0x00, 0xff, 0x23, 0x00, 0x2b, 0x02 };
+    uint8_t program[7] = { 0x14, 0x00, 0x19, 0x33, 0x00, 0x3b, 0x01 };
 
     trk8_memory_t memory;
     trk8_registers_t registers;
 
-    memory_init(&memory, program, 10);
+    memory_init(&memory, program, 7);
     registers_init(&registers);
 
-    cpu_run(&memory, &registers);
-
     registers_debug_print(registers);
+
+    cpu_run(&memory, &registers);
 }
