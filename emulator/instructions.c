@@ -17,6 +17,8 @@ void trk8_mov(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
 
             registers_set(registers, register_id, data);
 
+            registers_update_flags(registers, data);
+
             break;
         }
 
@@ -29,6 +31,8 @@ void trk8_mov(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
             uint8_t source_data = registers_get(*registers, source_id);
 
             registers_set(registers, destination_id, source_data);
+
+            registers_update_flags(registers, source_data);
 
             break;
         }
@@ -45,6 +49,11 @@ void trk8_lda(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
     memory_increment_program_counter(memory, 1);
 
     registers->address.high = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+
+    registers_update_flags(
+        registers,
+        TRK8_WORD(registers->address.high, registers->address.low)
+    );
 
     memory_increment_program_counter(memory, 1);
 }
@@ -93,6 +102,8 @@ void trk8_ldb(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
 
     registers_set(registers, register_id, data);
 
+    registers_update_flags(registers, data);
+
     memory_increment_program_counter(memory, 1);
 }
 
@@ -130,23 +141,153 @@ void trk8_pop(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operan
 
     registers_set(registers, register_id, data);
 
+    registers_update_flags(registers, data);
+
     memory_increment_program_counter(memory, 1);
 }
 
 void trk8_add(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    memory_increment_program_counter(memory, 1);
 
+    switch (operands_type) {
+        case TRK8_OPERANDS_TYPE_REG_IMM8: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_value = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+
+            uint16_t sum = left_operand_value + right_operand_value;
+
+            registers_set(registers, left_operand_id, sum);
+
+            registers_update_flags(registers, sum);
+
+            break;
+        }
+
+        case TRK8_OPERANDS_TYPE_REG_REG: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t right_operand_value = registers_get(*registers, right_operand_id);
+
+            uint16_t sum = left_operand_value + right_operand_value;
+
+            registers_set(registers, left_operand_id, sum);
+
+            registers_update_flags(registers, sum);
+
+            break;
+        }
+    }
+
+    memory_increment_program_counter(memory, 1);
 }
 
 void trk8_and(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    memory_increment_program_counter(memory, 1);
 
+    switch (operands_type) {
+        case TRK8_OPERANDS_TYPE_REG_IMM8: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_value = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+
+            uint16_t result = left_operand_value & right_operand_value;
+
+            registers_set(registers, left_operand_id, result);
+
+            registers_update_flags(registers, result);
+
+            break;
+        }
+
+        case TRK8_OPERANDS_TYPE_REG_REG: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t right_operand_value = registers_get(*registers, right_operand_id);
+
+            uint16_t result = left_operand_value & right_operand_value;
+
+            registers_set(registers, left_operand_id, result);
+
+            registers_update_flags(registers, result);
+
+            break;
+        }
+    }
+
+    memory_increment_program_counter(memory, 1);
 }
 
 void trk8_or(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    memory_increment_program_counter(memory, 1);
 
+    switch (operands_type) {
+        case TRK8_OPERANDS_TYPE_REG_IMM8: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_value = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+
+            uint16_t result = left_operand_value | right_operand_value;
+
+            registers_set(registers, left_operand_id, result);
+
+            registers_update_flags(registers, result);
+
+            break;
+        }
+
+        case TRK8_OPERANDS_TYPE_REG_REG: {
+            uint8_t left_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t left_operand_value = registers_get(*registers, left_operand_id);
+
+            memory_increment_program_counter(memory, 1);
+
+            uint8_t right_operand_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+            uint8_t right_operand_value = registers_get(*registers, right_operand_id);
+
+            uint16_t result = left_operand_value | right_operand_value;
+
+            registers_set(registers, left_operand_id, result);
+
+            registers_update_flags(registers, result);
+
+            break;
+        }
+    }
+
+    memory_increment_program_counter(memory, 1);
 }
 
 void trk8_not(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {
+    memory_increment_program_counter(memory, 1);
 
+    uint8_t register_id = memory_fetch_byte(*memory, memory_get_program_counter(*memory));
+    uint8_t value = registers_get(*registers, register_id);
+
+    uint8_t result = ~value;
+
+    registers_set(registers, register_id, result);
+
+    registers_update_flags(registers, result);
+
+    memory_increment_program_counter(memory, 1);
 }
 
 void trk8_cmp(trk8_memory_t* memory, trk8_registers_t* registers, uint8_t operands_type) {

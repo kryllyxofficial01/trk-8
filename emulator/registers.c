@@ -41,8 +41,6 @@ void registers_set(trk8_registers_t* registers, register_id_t register_id, uint8
         case TRK8_REGISTER_ADDRESS_LOW: registers->address.low = value; break;
         case TRK8_REGISTER_ADDRESS_HIGH: registers->address.high = value; break;
     }
-
-    registers_update_flags(registers, value);
 }
 
 void registers_update_flags(trk8_registers_t* registers, uint16_t value) {
@@ -71,14 +69,14 @@ void registers_update_flags(trk8_registers_t* registers, uint16_t value) {
 void registers_debug_print(const trk8_registers_t registers) {
     printf("Register Values:\n");
 
-    printf("\tA: 0x%x\n", registers.general_purpose.a);
-    printf("\tB: 0x%x\n", registers.general_purpose.b);
-    printf("\tC: 0x%x\n", registers.general_purpose.c);
-    printf("\tD: 0x%x\n", registers.general_purpose.d);
+    printf("\tA: 0x%02x\n", registers.general_purpose.a);
+    printf("\tB: 0x%02x\n", registers.general_purpose.b);
+    printf("\tC: 0x%02x\n", registers.general_purpose.c);
+    printf("\tD: 0x%02x\n", registers.general_purpose.d);
 
-    printf("\tSP: 0x%x\n", registers.stack_pointer);
+    printf("\tSP: 0x%02x\n", registers.stack_pointer);
 
-    printf("\tAddress: 0x%x\n", TRK8_WORD(registers.address.high, registers.address.low));
+    printf("\tAddress: 0x%02x\n", TRK8_WORD(registers.address.high, registers.address.low));
 
-    printf("\tF: 0x%x\n", registers.flags);
+    printf("\tF: 0x%02x\n", registers.flags);
 }
