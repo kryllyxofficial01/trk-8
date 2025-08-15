@@ -1,3 +1,3 @@
 # trk-8
 
-Basic homebrew CPU designed to test my knowledge.
+RISC-inspired computer with a custom architecture, instruction set, and emulator + assembler
