@@ -25,7 +25,7 @@ ASM_EXEC = trk8-asm
 all: clean emulator assembler
 
 emulator: $(BUILD_DIR)/$(EMU_EXEC)
-emulator: $(BUILD_DIR)/$(ASM_EXEC)
+assembler: $(BUILD_DIR)/$(ASM_EXEC)
 
 $(BUILD_DIR)/$(EMU_EXEC): $(EMU_OBJS)
 	$(GCC) $(EMU_OBJS) -o $@
