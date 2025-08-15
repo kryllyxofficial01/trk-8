@@ -2,6 +2,7 @@
 #define __TRK8_UTILS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 
 #ifndef TRK8_BIT_CHECK

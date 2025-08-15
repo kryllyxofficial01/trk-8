@@ -66,7 +66,9 @@ typedef struct _TRK8_MEMORY {
     uint8_t program_counter[TRK8_PROGRAM_COUNTER_LENGTH];
 } trk8_memory_t;
 
-void memory_init(trk8_memory_t* total_memory, uint8_t* program_memory, const uint16_t program_memory_length);
+void memory_init(trk8_memory_t* memory);
+
+void memory_write_program(trk8_memory_t* total_memory, uint8_t* program, const uint16_t program_length);
 
 uint8_t memory_fetch_byte(const trk8_memory_t memory, const uint16_t address);
 void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint8_t data);

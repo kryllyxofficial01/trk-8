@@ -1,13 +1,10 @@
 #ifndef __TRK8_CPU_H
 #define __TRK8_CPU_H
 
-#include "memory.h"
-#include "registers.h"
+#include "trk8.h"
 #include "instructions.h"
 #include "utils.h"
 
-void cpu_run(trk8_memory_t* memory, trk8_registers_t* registers);
-
-void cpu_print_state(const trk8_memory_t memory, const trk8_registers_t registers);
+void cpu_run(trk8_machine_t* machine);
 
 #endif

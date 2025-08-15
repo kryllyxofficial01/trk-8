@@ -1,29 +1,35 @@
 #include "include/memory.h"
 
-void memory_init(trk8_memory_t* total_memory, uint8_t* program_memory, const uint16_t program_memory_length) {
+void memory_init(trk8_memory_t* memory) {
     for (uint16_t i = 0; i < TRK8_PROGRAM_MEMORY_LENGTH; i++) {
-        total_memory->program_memory[i] = 0x0;
+        memory->program_memory[i] = 0x0;
     }
 
     for (uint16_t i = 0; i < TRK8_STACK_LENGTH; i++) {
-        total_memory->stack[i] = 0x0;
+        memory->stack[i] = 0x0;
     }
 
-    if (program_memory_length > TRK8_PROGRAM_MEMORY_LENGTH) {
+    for (uint16_t i = 0; i < TRK8_GENERAL_PURPOSE_MEMORY_LENGTH; i++) {
+        memory->general_purpose[i] = 0x0;
+    }
+
+    memory->program_counter[0] = TRK8_GET_LOW_BYTE(TRK8_PROGRAM_MEMORY_START);
+    memory->program_counter[1] = TRK8_GET_HIGH_BYTE(TRK8_PROGRAM_MEMORY_START);
+}
+
+void memory_write_program(trk8_memory_t* total_memory, uint8_t* program, const uint16_t program_length) {
+    if (program_length > TRK8_PROGRAM_MEMORY_LENGTH) {
         // TODO: handle oversized program memory
         return;
     }
 
     for (uint16_t i = 0; i < TRK8_PROGRAM_MEMORY_LENGTH; i++) {
-        total_memory->program_memory[i] = (i < program_memory_length) ? program_memory[i] : 0x0;
+        total_memory->program_memory[i] = (i < program_length) ? program[i] : 0x0;
     }
 
-    if (program_memory_length <= TRK8_PROGRAM_MEMORY_LENGTH - 1) {
-        total_memory->program_memory[program_memory_length] = TRK8_PROGRAM_MEMORY_EOP_BYTE;
+    if (program_length <= TRK8_PROGRAM_MEMORY_LENGTH - 1) {
+        total_memory->program_memory[program_length] = TRK8_PROGRAM_MEMORY_EOP_BYTE;
     }
-
-    total_memory->program_counter[0] = TRK8_GET_LOW_BYTE(TRK8_PROGRAM_MEMORY_START);
-    total_memory->program_counter[1] = TRK8_GET_HIGH_BYTE(TRK8_PROGRAM_MEMORY_START);
 }
 
 uint8_t memory_fetch_byte(const trk8_memory_t memory, const uint16_t address) {
