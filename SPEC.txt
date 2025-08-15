@@ -1,41 +1,53 @@
-===== Instruction Set =====
-nop                   : No operation
-mov <reg> <reg/imm8>  : Load <reg/imm8> into <reg>
-lda <label/reg/imm16> : Load either the memory location of <label> or <reg/imm> in AB
-stb <reg>             : Store <reg> into RAM at the address in AB
-ldb <reg>             : Load from RAM at the address in AB into <reg>
-push <reg/imm8>       : Push <reg/imm8> onto the stack
-pop <reg>             : Pop from the stack into <reg>
-add <reg> <reg/imm8>  : Add <reg> and <reg/imm8> together
-sub <reg> <reg/imm8>  : Subtract <reg/imm8> from <reg>
-mul <reg> <reg/imm8>  : Multiply <reg> and <reg/imm8> together
-div <reg> <reg/imm8>  : Divide <reg/imm8> into <reg>
-and <reg> <reg/imm8>  : Bitwise AND <reg> and <reg/imm8>
-or <reg> <reg/imm8>   : Bitwise OR <reg> and <reg/imm8>
-not <reg>             : Bitwise AND <reg>
-xor <reg> <reg/imm8>  : Bitwise XOR <reg> and <reg/imm8>
-cmp <reg> <reg/imm8>  : Subtract <reg/imm8> from <reg>, but only update flags
-jmp                   : Unconditionally jump to the address in AB
-jz                    : Jump to the address in AB if the zero flag is set
-jc                    : Jump to the address in AB if the carry flag is set
-jn                    : Jump to the address in AB if the negative flag is set
-hlt                   : Halt the CPU
+======================= Instruction Set =======================
+0x08 -> nop          : No Operation
+0x14 -> mov %r, $i8  : Move [ r = i8 ]
+0x16 -> mov %r1, %r2 : Move [ r1 = r2 ]
+0x1a -> lda $i16     : Load Address* [ ((ah << 8) | al) = i16 ]
+0x21 -> stb $i8      : Store Byte [ ((ah << 8) | al) = i8 ]
+0x23 -> stb %r       : Store Byte [ ((ah << 8) | al) = r ]
+0x2b -> ldb %r       : Load Byte [ r = ((ah << 8) | al) ]
+0x31 -> push $i8     : Push to stack [ sp-- = r ]
+0x33 -> push %r      : Push to stack [ sp-- = r ]
+0x3b -> pop %r       : Pop from stack [ r = ++sp ]
+0x44 -> add %r, $i8  : Add [ r += i8 ]
+0x46 -> add %r1, %r2 : Add [ r1 += r2 ]
+0x4c -> and %r, $i8  : And [ r &= i8 ]
+0x4e -> and %r1, %r2 : And [ r1 &= r2 ]
+0x54 -> or %r, $i8   : Or [ r |= i8 ]
+0x56 -> or %r1, %r2  : Or [ r1 |= r2 ]
+0x5b -> not %r       : Not [ r = ~r ]
+0x64 -> cmp %r, $i8  : Compare* [ f = r1 - i8 ]
+0x66 -> cmp %r1, %r2 : Compare** [ f = r1 - r2 ]
+0x68 -> jmp          : Jump [ pc = ((ah << 8) | al) ]
+0x70 -> jn           : Jump if Negative [ pc = ((ah << 8) | al), if f.n ]
+0x78 -> jc           : Jump if Carry [ pc = ((ah << 8) | al), if f.c ]
+0x80 -> jz           : Jump if Zero [ pc = ((ah << 8) | al), if f.z ]
+0x88 -> hlt          : Halt
 
-*NOTES*:
-- All ALU-based operations store the result in the first specified register
-- "AB" is shorthand for a memory location in which the low byte is in register B and the high byte in register A
+* Any label passed will be converted to its address counterpart
+** Updates flag register without storing the result
 
-===== Registers =====
+========================== Registers ==========================
 General Purpose (8-bit): a, b, c, d
-Stack Pointer (8-bit): sp
-Flags (8-bit): f
-    - Zero
-    - Carry
-    - Negative
-Program Counter (16-bit, stored in memory): pc
 
-===== Memory Layout =====
+Stack Pointer* (8-bit): sp
+
+Address (8-bit): al, ah
+
+Flags** (4-bit): f -> - Z C N
+                      | | | |
+                      | | | +- Negative
+                      | | +--- Carry
+                      | +----- Zero
+                      +------- (unused)
+
+Program Counter** (16-bit, stored in memory): pc
+
+* Programs cannot write to, only read from
+** Programs can only interact via select instructions
+
+======================== Memory Layout ========================
 0x0000-0x7fff: Program Memory
-0x8000-0x80ff: Stack
+0x8000-0x80ff: Stack (LIFO)
 0x8100-0xfffd: General Purpose
 0xfffe-0xffff: Program Counter

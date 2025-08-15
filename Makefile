@@ -1,21 +1,45 @@
-GXX=gcc
-GXX_FLAGS=-g -Wno-discarded-qualifiers
+GXX = gcc
 
-ASM_SRC=$(wildcard src/assembler/*.c)
-EMU_SRC=$(wildcard src/emulator/*.c)
+GXX_FLAGS = -g
 
-BUILD=build
+EMU_SRC = emulator
 
-all: clean assemble emulate
+BUILD = build
+OBJ = $(BUILD)/obj
 
-assemble:
-	$(GXX) $(GXX_FLAGS) $(ASM_SRC) -o $(BUILD)/assembler
+EMU_SRCS = $(wildcard $(EMU_SRC)/*.c)
+EMU_OBJS = $(subst $(EMU_SRC)/, $(OBJ)/, $(addsuffix .o, $(basename $(EMU_SRCS))))
 
-emulate:
-	$(GXX) $(GXX_FLAGS) $(EMU_SRC) -o $(BUILD)/emulator
+EMU_EXEC = trk8-emu
 
+all: clean emulator
+
+emulator: $(BUILD)/$(EMU_EXEC)
+
+$(BUILD)/$(EMU_EXEC): $(EMU_OBJS)
+	$(GXX) $(EMU_OBJS) -o $@
+
+$(OBJ)/%.o: $(EMU_SRC)/%.c
+	$(GXX) $(GXX_FLAGS) -c $< -o $@
+
+ifeq ($(OS), Windows_NT)
+.SILENT: clean
+endif
+
+.PHONY: clean
 clean: mkbuild
-	rm -rf $(BUILD)/*
+ifeq ($(OS), Windows_NT)
+	del /Q /S $(BUILD)\*
+else ifeq ($(shell uname), Linux)
+	find $(BUILD) -maxdepth 1 -type f -exec rm {} \;
+	rm -rf $(OBJ)/*
+endif
 
 mkbuild:
+ifeq ($(OS), Windows_NT)
+	if not exist "$(BUILD)" mkdir "$(BUILD)"
+	if not exist "$(OBJ)" mkdir "$(OBJ)"
+else ifeq ($(shell uname), Linux)
 	mkdir -p $(BUILD)
+	mkdir -p $(OBJ)
+endif
