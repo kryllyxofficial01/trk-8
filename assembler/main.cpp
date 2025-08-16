@@ -1,11 +1,17 @@
 #include <iostream>
 
-#include "include/token.hpp"
+#include "include/lexer.hpp"
 
 int main(void) {
-    Token token(TT_IDENTIFIER, "mov");
+    std::string file_contents = "\t\tmov\nadd";
 
-    std::cout << token.to_string() << std::endl;
+    Lexer lexer(file_contents);
+
+    std::vector<Token> tokens = lexer.lex();
+
+    for (Token token : tokens) {
+        std::cout << token.to_string() << std::endl;
+    }
 
     return EXIT_SUCCESS;
 }

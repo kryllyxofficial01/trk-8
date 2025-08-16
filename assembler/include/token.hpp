@@ -3,14 +3,18 @@
 #include <string>
 #include <format>
 
-typedef enum _TRK8_TOKEN_TYPES {
+enum TokenTypes {
     TT_IDENTIFIER,
-    TT_INTEGER
-} token_type_t;
+
+    TT_INTEGER,
+
+    TT_EOF = 255
+};
 
 class Token {
     public:
-        Token(const token_type_t& type, const std::string& value) : type(type), value(value) {}
+        Token(const enum TokenTypes type, const std::string value) : type(type), value(value) {}
+        Token() = default;
 
         inline std::string to_string() const {
             return std::format(
@@ -20,7 +24,15 @@ class Token {
             );
         }
 
+        enum TokenTypes get_type() const {
+            return this->type;
+        }
+
+        std::string get_value() const {
+            return this->value;
+        }
+
     private:
-        token_type_t type;
+        enum TokenTypes type;
         std::string value;
 };
