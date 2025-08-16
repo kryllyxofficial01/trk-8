@@ -6,7 +6,9 @@
 enum TokenTypes {
     TT_IDENTIFIER,
 
-    TT_INTEGER,
+    TT_DECIMAL,
+    TT_BINARY,
+    TT_HEXADECIMAL,
 
     TT_PERCENT_SIGN,
     TT_COMMA,

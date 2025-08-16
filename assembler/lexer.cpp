@@ -21,6 +21,9 @@ Token Lexer::get_next_token() {
         if (isalpha(this->current_character)) {
             return this->get_identifier();
         }
+        else if (isdigit(this->current_character)) {
+            return this->get_number();
+        }
         else {
             return this->get_character();
         }
@@ -41,6 +44,45 @@ Token Lexer::get_identifier() {
     return Token(TT_IDENTIFIER, identifier);
 }
 
+Token Lexer::get_number() {
+    std::string number;
+
+    if (this->current_character == '0') {
+        if (this->peek(1) == 'b') {
+            this->next_char();
+            this->next_char();
+
+            while (is_binary(this->current_character)) {
+                number += this->current_character;
+
+                this->next_char();
+            }
+
+            return Token(TT_BINARY, number);
+        }
+        else if (this->peek(1) == 'x') {
+            this->next_char();
+            this->next_char();
+
+            while (isxdigit(this->current_character)) {
+                number += this->current_character;
+
+                this->next_char();
+            }
+
+            return Token(TT_HEXADECIMAL, number);
+        }
+    }
+
+    while (isdigit(this->current_character)) {
+        number += this->current_character;
+
+        this->next_char();
+    }
+
+    return Token(TT_DECIMAL, number);
+}
+
 Token Lexer::get_character() {
     switch (this->current_character) {
         case '%': this->next_char(); return Token(TT_PERCENT_SIGN, "%");
@@ -51,7 +93,7 @@ Token Lexer::get_character() {
 
     return Token(
         TT_UNKNOWN_TOKEN,
-        std::string(1, this->file_contents[this->character_index - 1])
+        std::string(1, this->peek(-1))
     );
 }
 
@@ -59,6 +101,10 @@ void Lexer::skip_whitespace() {
     while (isspace(this->current_character)) {
         this->next_char();
     }
+}
+
+char Lexer::peek(const int amount) {
+    return this->file_contents[this->character_index + amount];
 }
 
 void Lexer::next_char() {
