@@ -29,7 +29,7 @@ Token Lexer::get_next_token() {
         }
     }
 
-    return Token(TokenTypes::TT_EOF, "\0");
+    return Token(TT_EOF, "\0");
 }
 
 Token Lexer::get_identifier() {
