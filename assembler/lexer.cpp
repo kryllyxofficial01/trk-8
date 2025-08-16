@@ -18,7 +18,7 @@ Token Lexer::get_next_token() {
     this->skip_whitespace();
 
     if (this->character_index < this->file_contents.length()) {
-        if (isalnum(this->current_character)) {
+        if (isalpha(this->current_character)) {
             return this->get_identifier();
         }
         else {
