@@ -3,7 +3,7 @@
 #include "include/lexer.hpp"
 
 int main(void) {
-    std::string file_contents = "\t\tmov\nadd";
+    std::string file_contents = "mov $a, 19";
 
     Lexer lexer(file_contents);
 

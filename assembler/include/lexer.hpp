@@ -19,6 +19,7 @@ class Lexer {
         Token get_next_token();
 
         Token get_identifier();
+        Token get_character();
 
         void skip_whitespace();
 

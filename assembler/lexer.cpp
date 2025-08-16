@@ -21,6 +21,9 @@ Token Lexer::get_next_token() {
         if (isalnum(this->current_character)) {
             return this->get_identifier();
         }
+        else {
+            return this->get_character();
+        }
     }
 
     return Token(TokenTypes::TT_EOF, "\0");
@@ -36,6 +39,20 @@ Token Lexer::get_identifier() {
     }
 
     return Token(TT_IDENTIFIER, identifier);
+}
+
+Token Lexer::get_character() {
+    switch (this->current_character) {
+        case '%': this->next_char(); return Token(TT_PERCENT_SIGN, "%");
+        case ',': this->next_char(); return Token(TT_COMMA, ",");
+    }
+
+    this->next_char();
+
+    return Token(
+        TT_UNKNOWN_TOKEN,
+        std::string(1, this->file_contents[this->character_index - 1])
+    );
 }
 
 void Lexer::skip_whitespace() {

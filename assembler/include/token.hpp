@@ -8,6 +8,10 @@ enum TokenTypes {
 
     TT_INTEGER,
 
+    TT_PERCENT_SIGN,
+    TT_COMMA,
+
+    TT_UNKNOWN_TOKEN = 254,
     TT_EOF = 255
 };
 
