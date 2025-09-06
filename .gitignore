@@ -54,3 +54,6 @@ dkms.conf
 
 # VS Code Configs
 .vscode
+
+# Valgrind Core Dumps
+vgcore.*
