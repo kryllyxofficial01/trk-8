@@ -1,7 +1,7 @@
 GPP = g++
 GCC = gcc
 
-GPP_FLAGS = -g -std=c++20
+GPP_FLAGS = -g -std=c++17
 GCC_FLAGS = -g
 
 ASM_SRC = assembler

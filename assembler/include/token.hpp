@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <format>
 
 enum TokenTypes {
     TT_IDENTIFIER,
@@ -13,6 +12,8 @@ enum TokenTypes {
     TT_PERCENT_SIGN,
     TT_COMMA,
 
+    TT_EOL, // newline
+
     TT_UNKNOWN_TOKEN = 254,
     TT_EOF = 255
 };
@@ -23,11 +24,7 @@ class Token {
         Token() = default;
 
         inline std::string to_string() const {
-            return std::format(
-                "TOKEN({}, '{}')",
-                static_cast<unsigned int>(this->type),
-                this->value
-            );
+            return "TOKEN(" + std::to_string(this->type) + ", '" + this->value + "')";
         }
 
         enum TokenTypes get_type() const {

@@ -12,7 +12,9 @@
 
 class Lexer {
     public:
-        Lexer(const std::string file_contents) : file_contents(file_contents) {
+        Lexer(const std::string file_contents) {
+            this->file_contents = std::move(file_contents);
+
             this->character_index = 0;
             this->current_character = this->file_contents[this->character_index];
         }
@@ -28,7 +30,7 @@ class Lexer {
 
         void skip_whitespace();
 
-        char peek(const int amount);
+        char peek(const int amount) const;
 
         void next_char();
 
