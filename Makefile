@@ -14,46 +14,58 @@ ASM_OBJ_DIR = $(OBJ_DIR)/assembler
 EMU_OBJ_DIR = $(OBJ_DIR)/emulator
 
 ASM_SRCS = $(wildcard $(ASM_SRC)/*.cpp)
-ASM_OBJS = $(subst $(ASM_SRC)/, $(ASM_OBJ_DIR)/, $(addsuffix .o, $(basename $(ASM_SRCS))))
+ASM_OBJS = $(patsubst $(ASM_SRC)/%.cpp,$(ASM_OBJ_DIR)/%.o,$(ASM_SRCS))
 
 EMU_SRCS = $(wildcard $(EMU_SRC)/*.c)
-EMU_OBJS = $(subst $(EMU_SRC)/, $(EMU_OBJ_DIR)/, $(addsuffix .o, $(basename $(EMU_SRCS))))
+EMU_OBJS = $(patsubst $(EMU_SRC)/%.c,$(EMU_OBJ_DIR)/%.o,$(EMU_SRCS))
 
 ASM_EXEC = trk8-asm
 EMU_EXEC = trk8-emu
 
 all: assembler emulator
 
-assembler: clean_asm $(BUILD_DIR)/$(ASM_EXEC)
-emulator: clean_emu $(BUILD_DIR)/$(EMU_EXEC)
+assembler: $(BUILD_DIR)/$(ASM_EXEC)
+emulator: $(BUILD_DIR)/$(EMU_EXEC)
 
 $(BUILD_DIR)/$(ASM_EXEC): $(ASM_OBJS)
 	$(GPP) $(ASM_OBJS) -o $@
 
-$(ASM_OBJ_DIR)/%.o: $(ASM_SRC)/%.cpp
+$(ASM_OBJ_DIR)/%.o: $(ASM_SRC)/%.cpp | mkbuild
 	$(GPP) $(GPP_FLAGS) -c $< -o $@
 
 $(BUILD_DIR)/$(EMU_EXEC): $(EMU_OBJS)
 	$(GCC) $(EMU_OBJS) -o $@
 
-$(EMU_OBJ_DIR)/%.o: $(EMU_SRC)/%.c
+$(EMU_OBJ_DIR)/%.o: $(EMU_SRC)/%.c | mkbuild
 	$(GCC) $(GCC_FLAGS) -c $< -o $@
 
 .SILENT: clean
-.PHONY: clean
+.PHONY: clean clean_asm clean_emu mkbuild all assembler emulator
+
+ifeq ($(OS),Windows_NT)
+    RMFILE = del /Q
+    RMDIR = rmdir /S /Q
+    MKDIR = if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
+    SEP = \\
+else
+    RMFILE = find $1 -maxdepth 1 -type f -exec rm {} \;
+    RMDIR = rm -rf $1/*
+    MKDIR = mkdir -p $1
+    SEP = /
+endif
 
 clean: clean_asm clean_emu
-	if exist "$(subst /,\,$(BUILD_DIR))" del /Q "$(subst /,\,$(BUILD_DIR))\*.*"
+	$(call RMFILE,$(BUILD_DIR))
+	$(call RMDIR,$(OBJ_DIR))
 
-clean_asm: mkbuild
-	if exist "$(subst /,\,$(ASM_OBJ_DIR))" del /Q /S "$(subst /,\,$(ASM_OBJ_DIR))\*"
+clean_asm:
+	$(call RMDIR,$(ASM_OBJ_DIR))
 
-clean_emu: mkbuild
-	if exist "$(subst /,\,$(EMU_OBJ_DIR))" del /Q /S "$(subst /,\,$(EMU_OBJ_DIR))\*"
+clean_emu:
+	$(call RMDIR,$(EMU_OBJ_DIR))
 
 mkbuild:
-	if not exist "$(subst /,\,$(BUILD_DIR))" mkdir "$(subst /,\,$(BUILD_DIR))"
-
-	if not exist "$(subst /,\,$(OBJ_DIR))" mkdir "$(subst /,\,$(OBJ_DIR))"
-	if not exist "$(subst /,\,$(ASM_OBJ_DIR))" mkdir "$(subst /,\,$(ASM_OBJ_DIR))"
-	if not exist "$(subst /,\,$(EMU_OBJ_DIR))" mkdir "$(subst /,\,$(EMU_OBJ_DIR))"
+	$(call MKDIR,$(BUILD_DIR))
+	$(call MKDIR,$(OBJ_DIR))
+	$(call MKDIR,$(ASM_OBJ_DIR))
+	$(call MKDIR,$(EMU_OBJ_DIR))
