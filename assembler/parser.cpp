@@ -78,7 +78,7 @@ operand_node_t Parser::parse_operand() {
 
         unsigned int number = std::stoi(token_value, nullptr, radix);
 
-        return std::make_unique<OperandNode<uint16_t>>(
+        return std::make_unique<OperandNode<unsigned int>>(
             number,
             OperandBaseNode::OperandNodeType::ONT_IMMEDIATE
         );
