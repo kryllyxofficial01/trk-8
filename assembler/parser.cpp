@@ -76,7 +76,7 @@ operand_node_t Parser::parse_operand() {
             this->eat(TokenTypes::TT_HEXADECIMAL);
         }
 
-        uint16_t number = std::stoi(token_value, nullptr, radix);
+        unsigned int number = std::stoi(token_value, nullptr, radix);
 
         return std::make_unique<OperandNode<uint16_t>>(
             number,
