@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "node.hpp"
 #include "operand_node.hpp"
+#include "node.hpp"
 
 class InstructionNode : public Node {
     public:

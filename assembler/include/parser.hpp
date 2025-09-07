@@ -5,10 +5,7 @@
 #include <cstdint>
 
 #include "token.hpp"
-
-#include "nodes/root_node.hpp"
-#include "nodes/instruction_node.hpp"
-#include "nodes/node.hpp"
+#include "nodes/nodes.hpp"
 
 class Parser {
     public:
