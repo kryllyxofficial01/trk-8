@@ -9,34 +9,44 @@
 
 class OperandBaseNode : public Node {
     public:
-        enum class OperandNodeType {
+        enum OperandNodeType {
             ONT_IMMEDIATE,
             ONT_REGISTER
         };
 
-        virtual OperandNodeType get_type() const = 0;
+        virtual const OperandNodeType get_type() const = 0;
 };
 
 template <typename T>
 class OperandNode : public OperandBaseNode {
     public:
-        explicit OperandNode(T value) : value(std::move(value)) {}
+        explicit OperandNode(T value, OperandNodeType operand_node_type) {
+            this->value = std::move(value);
+            this->type = operand_node_type;
+        }
         
         const T& get_value() const {
             return this->value;
         }
 
+        const OperandNodeType get_type() const override {
+            return this->type;
+        }
+
         std::string to_string() const override {
+            std::string type_as_string = std::to_string(this->type);
+
             if constexpr (std::is_same_v<T, std::string>) {
-                return "OPERANDNODE(" + this->value + ")";
+                return "OPERANDNODE(" + type_as_string + ", '" + this->value + "')";
             }
             else {
-                return "OPERANDNODE(" + std::to_string(this->value) + ")";
+                return "OPERANDNODE(" + type_as_string + ", '" + std::to_string(this->value) + "')";
             }
         }
 
     private:
         T value;
+        OperandNodeType type;
 };
 
 using operand_node_t = std::unique_ptr<OperandBaseNode>;

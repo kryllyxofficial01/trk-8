@@ -1,4 +1,5 @@
 #include "include/parser.hpp"
+#include "include/nodes/operand_node.hpp"
 
 root_node_t Parser::parse() {
     root_node_t root_node = std::make_unique<RootNode>();
@@ -25,7 +26,36 @@ node_t Parser::parse_identifier() {
 
     instruction_node_t instruction_node = std::make_unique<InstructionNode>(identifier);
 
+    while (true) {
+        if (this->match(TokenTypes::TT_EOL) || this->match(this->peek().get_type())) {
+            break;
+        }
+
+        if (this->match(TokenTypes::TT_COMMA)) {
+            this->eat(TokenTypes::TT_COMMA);
+
+            continue;
+        }
+
+        instruction_node->add_operand(this->parse_operand());
+    }
+
     return instruction_node;
+}
+
+operand_node_t Parser::parse_operand() {
+    if (this->match(TokenTypes::TT_PERCENT_SIGN)) {
+        this->eat(TokenTypes::TT_PERCENT_SIGN);
+
+        std::string register_id = this->current_token.get_value();
+
+        this->eat(TokenTypes::TT_IDENTIFIER);
+
+        return std::make_unique<OperandNode<std::string>>(
+            register_id,
+            OperandBaseNode::OperandNodeType::ONT_REGISTER
+        );
+    }
 }
 
 void Parser::eat(const TokenTypes expected_type) {

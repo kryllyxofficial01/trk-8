@@ -12,11 +12,8 @@ class InstructionNode : public Node {
     public:
         explicit InstructionNode(std::string mnemonic) : mnemonic(mnemonic) {}
 
-        template <typename T>
-        void add_operand(T operand_value) {
-            this->operands.push_back(
-                std::make_unique<OperandNode<T>>(std::move(operand_value))
-            );
+        void add_operand(operand_node_t operand_node) {
+            this->operands.push_back(std::move(operand_node));
         }
 
         const std::string& get_mnemonic() const {
@@ -39,7 +36,7 @@ class InstructionNode : public Node {
                     stream << operand->to_string() << "\n";
                 }
 
-                stream << "}\n";
+                stream << "}";
             }
 
             return stream.str();

@@ -23,13 +23,24 @@ class Parser {
         node_t get_next_node();
 
         node_t parse_identifier();
+        operand_node_t parse_operand();
 
         void eat(const TokenTypes expected_type);
 
         void next_token();
 
         inline const Token& peek(const int offset = 1) const {
+            if (this->token_index + offset >= this->tokens.size()) {
+                static Token eof(TokenTypes::TT_EOF, "\0");
+
+                return eof;
+            }
+
             return this->tokens[this->token_index + offset];
+        }
+
+        inline bool match(const TokenTypes token_type) const {
+            return this->current_token.get_type() == token_type;
         }
 
         std::vector<Token> tokens;
