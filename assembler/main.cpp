@@ -4,7 +4,7 @@
 #include "include/parser.hpp"
 
 int main(void) {
-    std::string file_contents = "push %a";
+    std::string file_contents = "mov %a, 0x19";
 
     Lexer lexer(file_contents);
 

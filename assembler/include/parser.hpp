@@ -2,6 +2,7 @@
 #define __TRK8_PARSER_HPP
 
 #include <vector>
+#include <cstdint>
 
 #include "token.hpp"
 
@@ -39,8 +40,18 @@ class Parser {
             return this->tokens[this->token_index + offset];
         }
 
-        inline bool match(const TokenTypes token_type) const {
+        inline bool match_type(const TokenTypes token_type) const {
             return this->current_token.get_type() == token_type;
+        }
+
+        inline bool is_number_token() const {
+            bool result = false;
+
+            result |= this->match_type(TokenTypes::TT_DECIMAL);
+            result |= this->match_type(TokenTypes::TT_BINARY);
+            result |= this->match_type(TokenTypes::TT_HEXADECIMAL);
+
+            return result;
         }
 
         std::vector<Token> tokens;

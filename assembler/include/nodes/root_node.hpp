@@ -27,7 +27,7 @@ class RootNode : public Node {
                 stream << node->to_string() << "\n";
             }
 
-            stream << "}\n";
+            stream << "}";
 
             return stream.str();
         }

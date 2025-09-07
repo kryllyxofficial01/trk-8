@@ -1,5 +1,4 @@
 #include "include/parser.hpp"
-#include "include/nodes/operand_node.hpp"
 
 root_node_t Parser::parse() {
     root_node_t root_node = std::make_unique<RootNode>();
@@ -27,11 +26,11 @@ node_t Parser::parse_identifier() {
     instruction_node_t instruction_node = std::make_unique<InstructionNode>(identifier);
 
     while (true) {
-        if (this->match(TokenTypes::TT_EOL) || this->match(this->peek().get_type())) {
+        if (this->match_type(TokenTypes::TT_EOL) || this->match_type(this->peek().get_type())) {
             break;
         }
 
-        if (this->match(TokenTypes::TT_COMMA)) {
+        if (this->match_type(TokenTypes::TT_COMMA)) {
             this->eat(TokenTypes::TT_COMMA);
 
             continue;
@@ -44,7 +43,7 @@ node_t Parser::parse_identifier() {
 }
 
 operand_node_t Parser::parse_operand() {
-    if (this->match(TokenTypes::TT_PERCENT_SIGN)) {
+    if (this->match_type(TokenTypes::TT_PERCENT_SIGN)) {
         this->eat(TokenTypes::TT_PERCENT_SIGN);
 
         std::string register_id = this->current_token.get_value();
@@ -54,6 +53,34 @@ operand_node_t Parser::parse_operand() {
         return std::make_unique<OperandNode<std::string>>(
             register_id,
             OperandBaseNode::OperandNodeType::ONT_REGISTER
+        );
+    }
+    else if (is_number_token()) {
+        uint8_t radix;
+        
+        std::string token_value = this->current_token.get_value();
+
+        if (this->match_type(TokenTypes::TT_DECIMAL)) {
+            radix = 10;
+
+            this->eat(TokenTypes::TT_DECIMAL);
+        }
+        else if (this->match_type(TokenTypes::TT_BINARY)) {
+            radix = 2;
+
+            this->eat(TokenTypes::TT_BINARY);
+        }
+        else if (this->match_type(TokenTypes::TT_HEXADECIMAL)) {
+            radix = 16;
+
+            this->eat(TokenTypes::TT_HEXADECIMAL);
+        }
+
+        uint16_t number = std::stoi(token_value, nullptr, radix);
+
+        return std::make_unique<OperandNode<uint16_t>>(
+            number,
+            OperandBaseNode::OperandNodeType::ONT_IMMEDIATE
         );
     }
 }
