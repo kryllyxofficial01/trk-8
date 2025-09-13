@@ -6,18 +6,21 @@
 
 #include "token.hpp"
 
+#ifndef TRK8_NEXT_CHAR
+    #define TRK8_NEXT_CHAR (1)
+#endif
+
+#ifndef TRK8_PREVIOUS_CHAR
+    #define TRK8_PREVIOUS_CHAR (-1)
+#endif
+
 #ifndef is_binary
     #define is_binary(_char) ((_char) == '0' || (_char) == '1')
 #endif
 
 class Lexer {
     public:
-        Lexer(const std::string file_contents) {
-            this->file_contents = std::move(file_contents);
-
-            this->character_index = 0;
-            this->current_character = this->file_contents[this->character_index];
-        }
+        Lexer(std::string file_contents); 
 
         std::vector<Token> lex();
 
@@ -30,7 +33,7 @@ class Lexer {
 
         void skip_whitespace();
 
-        char peek(const int amount) const;
+        char peek_char(const int amount) const;
 
         void next_char();
 

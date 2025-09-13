@@ -8,7 +8,7 @@ class Node {
     public:
         virtual ~Node() = default;
 
-        virtual std::string to_string() const = 0;
+        virtual const std::string to_string() const = 0;
 };
 
 using node_t = std::unique_ptr<Node>;

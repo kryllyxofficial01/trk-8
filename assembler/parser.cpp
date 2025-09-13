@@ -1,5 +1,13 @@
 #include "include/parser.hpp"
 
+Parser::Parser(std::vector<Token> tokens) {
+    this->tokens = std::move(tokens);
+
+    this->token_index = 0;
+
+    this->current_token = this->tokens[this->token_index];
+}
+
 root_node_t Parser::parse() {
     root_node_t root_node = std::make_unique<RootNode>();
 
@@ -25,8 +33,14 @@ node_t Parser::parse_identifier() {
 
     instruction_node_t instruction_node = std::make_unique<InstructionNode>(identifier);
 
+    bool is_eol = false;
+    bool is_eof = false;
+
     while (true) {
-        if (this->match_type(TokenTypes::TT_EOL) || this->match_type(this->peek().get_type())) {
+        is_eol |= this->match_type(TokenTypes::TT_EOL);
+        is_eof |= this->match_type(TokenTypes::TT_EOF);
+
+        if (is_eol || is_eof) {
             break;
         }
 
@@ -91,6 +105,30 @@ void Parser::eat(const TokenTypes expected_type) {
     }
 
     this->next_token();
+}
+
+inline const Token& Parser::peek(const int offset) const {
+    if (this->token_index + offset >= this->tokens.size()) {
+        static Token eof(TokenTypes::TT_EOF, "\0");
+
+        return eof;
+    }
+
+    return this->tokens[this->token_index + offset];
+}
+
+inline bool Parser::match_type(const TokenTypes token_type) const {
+    return this->current_token.get_type() == token_type;
+}
+
+inline bool Parser::is_number_token() const {
+    bool result = false;
+
+    result |= this->match_type(TokenTypes::TT_DECIMAL);
+    result |= this->match_type(TokenTypes::TT_BINARY);
+    result |= this->match_type(TokenTypes::TT_HEXADECIMAL);
+
+    return result;
 }
 
 void Parser::next_token() {

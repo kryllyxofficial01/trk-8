@@ -24,10 +24,12 @@ class InstructionNode : public Node {
             return this->operands;
         }
 
-        std::string to_string() const override {
+        const std::string to_string() const override {
             std::ostringstream stream;
 
-            stream << "INSTRUCTIONNODE(" << this->mnemonic << ")";
+            stream << "INSTRUCTIONNODE(";
+            stream << this->mnemonic;
+            stream << ")";
             
             if (this->operands.size() > 0) {
                 stream << "{\n";
@@ -44,6 +46,7 @@ class InstructionNode : public Node {
 
     private:
         std::string mnemonic;
+        
         std::vector<operand_node_t> operands;
 };
 

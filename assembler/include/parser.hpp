@@ -7,13 +7,17 @@
 #include "token.hpp"
 #include "nodes/nodes.hpp"
 
+#ifndef TRK8_NEXT_TOKEN
+    #define TRK8_NEXT_TOKEN (1)
+#endif
+
+#ifndef TRK8_PREVIOUS_TOKEN
+    #define TRK8_PREVIOUS_TOKEN (-1)
+#endif
+
 class Parser {
     public:
-        Parser(std::vector<Token> tokens) : tokens(std::move(tokens)) {
-            this->token_index = 0;
-
-            this->current_token = this->tokens[this->token_index]; 
-        }
+        Parser(std::vector<Token> tokens);
 
         root_node_t parse();
 
@@ -23,33 +27,15 @@ class Parser {
         node_t parse_identifier();
         operand_node_t parse_operand();
 
-        void eat(const TokenTypes expected_type);
+        void eat(const TokenTypes expected_type); 
+
+        inline const Token& peek(const int offset) const;
+
+        inline bool match_type(const TokenTypes token_type) const;
+
+        inline bool is_number_token() const;
 
         void next_token();
-
-        inline const Token& peek(const int offset = 1) const {
-            if (this->token_index + offset >= this->tokens.size()) {
-                static Token eof(TokenTypes::TT_EOF, "\0");
-
-                return eof;
-            }
-
-            return this->tokens[this->token_index + offset];
-        }
-
-        inline bool match_type(const TokenTypes token_type) const {
-            return this->current_token.get_type() == token_type;
-        }
-
-        inline bool is_number_token() const {
-            bool result = false;
-
-            result |= this->match_type(TokenTypes::TT_DECIMAL);
-            result |= this->match_type(TokenTypes::TT_BINARY);
-            result |= this->match_type(TokenTypes::TT_HEXADECIMAL);
-
-            return result;
-        }
 
         std::vector<Token> tokens;
 

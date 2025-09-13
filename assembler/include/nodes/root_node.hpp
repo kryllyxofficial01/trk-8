@@ -18,7 +18,7 @@ class RootNode : public Node {
             return this->nodes;
         }
 
-        std::string to_string() const override {
+        const std::string to_string() const override {
             std::ostringstream stream;
 
             stream << "ROOTNODE {\n";

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sstream>
 #include <string>
 
 enum TokenTypes {
@@ -24,14 +25,22 @@ class Token {
         Token() = default;
 
         inline std::string to_string() const {
-            return "TOKEN(" + std::to_string(this->type) + ", '" + this->value + "')";
+            std::ostringstream stream;
+
+            stream << "TOKEN(";
+            stream << std::to_string(this->type);
+            stream << ", '";
+            stream << this->value;
+            stream << "')";
+
+            return stream.str();
         }
 
-        enum TokenTypes get_type() const {
+        inline enum TokenTypes get_type() const {
             return this->type;
         }
 
-        std::string get_value() const {
+        inline std::string get_value() const {
             return this->value;
         }
 

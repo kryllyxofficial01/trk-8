@@ -1,5 +1,12 @@
 #include "include/lexer.hpp"
 
+Lexer::Lexer(std::string file_contents) {
+    this->file_contents = std::move(file_contents);
+
+    this->character_index = 0;
+    this->current_character = this->file_contents[this->character_index];
+}
+
 std::vector<Token> Lexer::lex() {
     std::vector<Token> tokens;
 
@@ -48,7 +55,7 @@ Token Lexer::get_number() {
     std::string number;
 
     if (this->current_character == '0') {
-        if (this->peek(1) == 'b') {
+        if (this->peek_char(TRK8_NEXT_CHAR) == 'b') {
             this->next_char();
             this->next_char();
 
@@ -60,7 +67,7 @@ Token Lexer::get_number() {
 
             return Token(TokenTypes::TT_BINARY, number);
         }
-        else if (this->peek(1) == 'x') {
+        else if (this->peek_char(TRK8_NEXT_CHAR) == 'x') {
             this->next_char();
             this->next_char();
 
@@ -94,7 +101,7 @@ Token Lexer::get_character() {
 
     return Token(
         TokenTypes::TT_UNKNOWN_TOKEN,
-        std::string(1, this->peek(-1))
+        std::string(1, this->peek_char(TRK8_PREVIOUS_CHAR))
     );
 }
 
@@ -104,7 +111,7 @@ void Lexer::skip_whitespace() {
     }
 }
 
-char Lexer::peek(const int amount) const {
+char Lexer::peek_char(const int amount) const {
     return this->file_contents[this->character_index + amount];
 }
 

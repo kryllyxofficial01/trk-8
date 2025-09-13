@@ -2,6 +2,7 @@
 #define __TRK8_OPERAND_NODE_HPP
 
 #include <memory>
+#include <sstream>
 #include <string>
 #include <type_traits>
 
@@ -33,15 +34,23 @@ class OperandNode : public OperandBaseNode {
             return this->type;
         }
 
-        std::string to_string() const override {
-            std::string type_as_string = std::to_string(this->type);
+        const std::string to_string() const override {
+            std::ostringstream stream;
+
+            stream << "OPERANDNODE(";
+            stream << std::to_string(this->type);
+            stream << ", '";
 
             if constexpr (std::is_same_v<T, std::string>) {
-                return "OPERANDNODE(" + type_as_string + ", '" + this->value + "')";
+                stream << this->value;
             }
             else {
-                return "OPERANDNODE(" + type_as_string + ", '" + std::to_string(this->value) + "')";
+                stream << std::to_string(this->value);
             }
+
+            stream << "')";
+
+            return stream.str();
         }
 
     private:
