@@ -28,8 +28,6 @@ uint8_t registers_get(const trk8_registers_t registers, register_id_t register_i
 
         case TRK8_REGISTER_ADDRESS_LOW: return registers.address.low;
         case TRK8_REGISTER_ADDRESS_HIGH: return registers.address.high;
-
-        case TRK8_REGISTER_FLAGS: return registers.flags;
     }
 }
 
@@ -40,12 +38,8 @@ void registers_set(trk8_registers_t* registers, register_id_t register_id, uint8
         case TRK8_REGISTER_GP_C: registers->general_purpose.c = value; break;
         case TRK8_REGISTER_GP_D: registers->general_purpose.d = value; break;
 
-        case TRK8_REGISTER_SP: registers->stack_pointer = value; break;
-
         case TRK8_REGISTER_ADDRESS_LOW: registers->address.low = value; break;
         case TRK8_REGISTER_ADDRESS_HIGH: registers->address.high = value; break;
-
-        case TRK8_REGISTER_FLAGS: registers->flags = value; break;
     }
 }
 

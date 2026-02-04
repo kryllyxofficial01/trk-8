@@ -196,39 +196,60 @@ void trk8_pop(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_adc(trk8_machine_t* machine, uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t left_operand_id = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    ); // the left operand will always be a register, so this is fine
-
-    uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-    uint8_t right_operand_value;
-
-    uint8_t right_operand_byte = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
+void trk8_add(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     switch (operands_type) {
+        case TRK8_OPERANDS_TYPE_REG_IMM8: {
+            uint8_t left_operand_id = memory_fetch_byte(
+                *machine->memory,
+                memory_get_program_counter(*machine->memory)
+            );
+
+            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
+
+            memory_increment_program_counter(machine->memory, 1);
+
+            uint8_t right_operand_value = memory_fetch_byte(
+                *machine->memory,
+                memory_get_program_counter(*machine->memory)
+            );
+
+            uint16_t sum = left_operand_value + right_operand_value;
+
+            registers_set(machine->registers, left_operand_id, sum);
+
+            registers_update_flags(machine->registers, sum);
+
+            break;
+        }
+
         case TRK8_OPERANDS_TYPE_REG_REG: {
-            right_operand_value = registers_get(*machine->registers, right_operand_byte);
+            uint8_t left_operand_id = memory_fetch_byte(
+                *machine->memory,
+                memory_get_program_counter(*machine->memory)
+            );
+
+            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
+
+            memory_increment_program_counter(machine->memory, 1);
+
+            uint8_t right_operand_id = memory_fetch_byte(
+                *machine->memory,
+                memory_get_program_counter(*machine->memory)
+            );
+
+            uint8_t right_operand_value = registers_get(*machine->registers, right_operand_id);
+
+            uint16_t sum = left_operand_value + right_operand_value;
+
+            registers_set(machine->registers, left_operand_id, sum);
+
+            registers_update_flags(machine->registers, sum);
 
             break;
         }
     }
-
-    uint8_t flags = registers_get(*machine->registers, TRK8_REGISTER_FLAGS);
-
-    uint16_t sum = left_operand_value + right_operand_value + TRK8_BIT_CHECK(flags, TRK8_CARRY_VALUE_BIT);
-
-    registers_set(machine->registers, left_operand_id, sum);
-
-    registers_update_flags(machine->registers, sum);
 
     memory_increment_program_counter(machine->memory, 1);
 }

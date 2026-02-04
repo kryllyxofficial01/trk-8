@@ -28,7 +28,7 @@ void cpu_run(trk8_machine_t* machine) {
             case TRK8_INSTRUCTION_LDB: trk8_ldb(machine, operands_type); break;
             case TRK8_INSTRUCTION_PUSH: trk8_push(machine, operands_type); break;
             case TRK8_INSTRUCTION_POP: trk8_pop(machine, operands_type); break;
-            case TRK8_INSTRUCTION_ADC: trk8_adc(machine, operands_type); break;
+            case TRK8_INSTRUCTION_ADD: trk8_add(machine, operands_type); break;
             case TRK8_INSTRUCTION_AND: trk8_and(machine, operands_type); break;
             case TRK8_INSTRUCTION_OR: trk8_or(machine, operands_type); break;
             case TRK8_INSTRUCTION_NOT: trk8_not(machine, operands_type); break;
