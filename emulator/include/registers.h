@@ -71,7 +71,9 @@ typedef enum _TRK8_REGISTER_IDS {
     TRK8_REGISTER_SP,
 
     TRK8_REGISTER_ADDRESS_LOW,
-    TRK8_REGISTER_ADDRESS_HIGH
+    TRK8_REGISTER_ADDRESS_HIGH,
+
+    TRK8_REGISTER_FLAGS
 } register_id_t;
 
 void registers_init(trk8_registers_t* registers);

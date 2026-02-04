@@ -1,50 +1,50 @@
 ======================= Instruction Set =======================
 0x08 -> nop          : No Operation
-0x14 -> mov %r, $i8  : Move [ r = i8 ]
-0x16 -> mov %r1, %r2 : Move [ r1 = r2 ]
-0x1a -> lda $i16     : Load Address* [ ((ah << 8) | al) = i16 ]
+0x14 -> mov %r, $i8  : Move* [ r = i8 ]
+0x16 -> mov %r1, %r2 : Move* [ r1 = r2 ]
+0x1a -> lda $i16     : Load Address** [ ((ah << 8) | al) = i16 ]
 0x21 -> stb $i8      : Store Byte [ ((ah << 8) | al) = i8 ]
 0x23 -> stb %r       : Store Byte [ ((ah << 8) | al) = r ]
-0x2b -> ldb %r       : Load Byte [ r = ((ah << 8) | al) ]
+0x2b -> ldb %r       : Load Byte* [ r = ((ah << 8) | al) ]
 0x31 -> push $i8     : Push to stack [ sp-- = r ]
 0x33 -> push %r      : Push to stack [ sp-- = r ]
-0x3b -> pop %r       : Pop from stack [ r = ++sp ]
-0x44 -> add %r, $i8  : Add [ r += i8 ]
-0x46 -> add %r1, %r2 : Add [ r1 += r2 ]
-0x4c -> and %r, $i8  : And [ r &= i8 ]
-0x4e -> and %r1, %r2 : And [ r1 &= r2 ]
-0x54 -> or %r, $i8   : Or [ r |= i8 ]
-0x56 -> or %r1, %r2  : Or [ r1 |= r2 ]
-0x5b -> not %r       : Not [ r = ~r ]
-0x64 -> cmp %r, $i8  : Compare** [ f = r1 - i8 ]
-0x66 -> cmp %r1, %r2 : Compare** [ f = r1 - r2 ]
+0x3b -> pop %r       : Pop from stack* [ r = ++sp ]
+0x44 -> adc %r, $i8  : Add with carry* [ r += i8 + f.c ]
+0x46 -> adc %r1, %r2 : Add with carry* [ r1 += r2 + f.c ]
+0x4c -> and %r, $i8  : Bitwise AND* [ r &= i8 ]
+0x4e -> and %r1, %r2 : Bitwise AND* [ r1 &= r2 ]
+0x54 -> or %r, $i8   : Bitwise OR* [ r |= i8 ]
+0x56 -> or %r1, %r2  : Bitwise OR* [ r1 |= r2 ]
+0x5b -> not %r       : Bitwise NOT* [ r = ~r ]
+0x64 -> cmp %r, $i8  : Compare*** [ f = r1 - i8 ]
+0x66 -> cmp %r1, %r2 : Compare*** [ f = r1 - r2 ]
 0x68 -> jmp          : Unconditional Jump [ pc = ((ah << 8) | al) ]
 0x70 -> jn           : Jump if Negative [ pc = ((ah << 8) | al), if f.n ]
 0x78 -> jc           : Jump if Carry [ pc = ((ah << 8) | al), if f.c ]
 0x80 -> jz           : Jump if Zero [ pc = ((ah << 8) | al), if f.z ]
 0x88 -> hlt          : Halt
 
-*  Label names passed will be resolved to corresponding address
-** Updates flag register without storing the result
+*   Updates flags based on result
+**  Any label names passed will be resolved to corresponding address during assembly
+*** Updates flag register without storing the result
 
 ========================== Registers ==========================
 General Purpose (8-bit): a, b, c, d
 
-Stack Pointer* (8-bit): sp
+Stack Pointer (8-bit): sp
 
 Address (8-bit): al, ah
 
-Flags** (4-bit): f -> - Z C N
+Flags (4-bit): f -> - Z C N
                       | | | |
                       | | | +- Negative
                       | | +--- Carry
                       | +----- Zero
                       +------- (unused)
 
-Program Counter** (16-bit, stored in memory): pc
+Program Counter* (16-bit, stored in memory): pc
 
-*  Read-only
-** Modified internally, only accessible to the programmer
+* Modified internally, only accessible to the programmer
    through select instructions
 
 ======================== Memory Layout ========================
