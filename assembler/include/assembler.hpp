@@ -6,6 +6,17 @@
 #include <unordered_map>
 #include <vector>
 
+#include "isa.hpp"
+#include "utils.hpp"
+
+#ifndef REGISTER_PREFIX
+    #define REGISTER_PREFIX '%'
+#endif
+
+#ifndef IMMEDIATE_PREFIX
+    #define IMMEDIATE_PREFIX '$'
+#endif
+
 struct AssemblyLine {
     size_t lineno;
 
