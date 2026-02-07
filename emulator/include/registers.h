@@ -28,11 +28,15 @@
 #endif
 
 #ifndef TRK8_NEGATIVE_VALUE_BIT
-    #define TRK8_NEGATIVE_VALUE_BIT (7)
+    #define TRK8_NEGATIVE_VALUE_BIT (8)
 #endif
 
-#ifndef TRK8_CARRY_VALUE_BIT
-    #define TRK8_CARRY_VALUE_BIT (8)
+// #ifndef TRK8_CARRY_VALUE_BIT
+//     #define TRK8_CARRY_VALUE_BIT (9)
+// #endif
+
+#ifndef TRK8_CARRY_VALUE_THRESHOLD
+    #define TRK8_CARRY_VALUE_THRESHOLD (UINT8_MAX)
 #endif
 
 #ifndef TRK8_STACK_POINTER_INITIAL_VALUE

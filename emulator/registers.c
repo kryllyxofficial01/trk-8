@@ -57,7 +57,8 @@ void registers_update_flags(trk8_registers_t* registers, uint16_t value) {
         TRK8_BIT_UNSET(registers->flags, TRK8_NEGATIVE_FLAG_INDEX);
     }
 
-    if (TRK8_BIT_CHECK(value, TRK8_CARRY_VALUE_BIT)) {
+    // if (TRK8_BIT_CHECK(value, TRK8_CARRY_VALUE_BIT)) {
+    if (value > TRK8_CARRY_VALUE_THRESHOLD) {
         TRK8_BIT_SET(registers->flags, TRK8_CARRY_FLAG_INDEX);
     }
     else {
