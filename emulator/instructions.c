@@ -1,49 +1,37 @@
 #include "include/instructions.h"
 
-void trk8_nop(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_nop(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_mov(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_mov(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
+
+    uint8_t destination = memory_fetch_byte(
+        *machine->memory,
+        memory_get_program_counter(*machine->memory)
+    );
+
+    memory_increment_program_counter(machine->memory, 1);
+
+    uint8_t source = memory_fetch_byte(
+        *machine->memory,
+        memory_get_program_counter(*machine->memory)
+    );
 
     switch (operands_type) {
         case TRK8_OPERANDS_TYPE_REG_IMM8: {
-            uint8_t register_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
+            registers_set(machine->registers, destination, source);
 
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t data = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            registers_set(machine->registers, register_id, data);
-
-            registers_update_flags(machine->registers, data);
+            registers_update_flags(machine->registers, source);
 
             break;
         }
 
         case TRK8_OPERANDS_TYPE_REG_REG: {
-            uint8_t destination_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
+            uint8_t source_data = registers_get(*machine->registers, source);
 
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t source_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t source_data = registers_get(*machine->registers, source_id);
-
-            registers_set(machine->registers, destination_id, source_data);
+            registers_set(machine->registers, destination, source_data);
 
             registers_update_flags(machine->registers, source_data);
 
@@ -54,7 +42,7 @@ void trk8_mov(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_lda(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_lda(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     registers_set(
@@ -80,7 +68,7 @@ void trk8_lda(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_stb(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_stb(trk8_machine_t* machine, const uint8_t operands_type) {
     uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
     uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
 
@@ -117,7 +105,7 @@ void trk8_stb(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_ldb(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_ldb(trk8_machine_t* machine, const uint8_t operands_type) {
     uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
     uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
 
@@ -139,7 +127,7 @@ void trk8_ldb(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_push(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_push(trk8_machine_t* machine, const uint8_t operands_type) {
     uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
 
     uint16_t stack_address = TRK8_STACK_START + stack_pointer;
@@ -173,7 +161,7 @@ void trk8_push(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_pop(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_pop(trk8_machine_t* machine, const uint8_t operands_type) {
     uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
 
     uint16_t stack_address = TRK8_STACK_START + stack_pointer;
@@ -196,7 +184,7 @@ void trk8_pop(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_adc(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_adc(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     switch (operands_type) {
@@ -258,7 +246,7 @@ void trk8_adc(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_and(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_and(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     switch (operands_type) {
@@ -316,7 +304,7 @@ void trk8_and(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_or(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_or(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     switch (operands_type) {
@@ -374,7 +362,7 @@ void trk8_or(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_not(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_not(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     uint8_t register_id = memory_fetch_byte(
@@ -392,7 +380,7 @@ void trk8_not(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_cmp(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_cmp(trk8_machine_t* machine, const uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 
     switch (operands_type) {
@@ -442,7 +430,7 @@ void trk8_cmp(trk8_machine_t* machine, uint8_t operands_type) {
     memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_jmp(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_jmp(trk8_machine_t* machine, const uint8_t operands_type) {
     uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
     uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
 
@@ -451,7 +439,7 @@ void trk8_jmp(trk8_machine_t* machine, uint8_t operands_type) {
     memory_set_program_counter(machine->memory, address);
 }
 
-void trk8_jn(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_jn(trk8_machine_t* machine, const uint8_t operands_type) {
     if (TRK8_BIT_CHECK(machine->registers->flags, TRK8_NEGATIVE_FLAG_INDEX)) {
         uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
         uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
@@ -465,7 +453,7 @@ void trk8_jn(trk8_machine_t* machine, uint8_t operands_type) {
     }
 }
 
-void trk8_jc(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_jc(trk8_machine_t* machine, const uint8_t operands_type) {
     if (TRK8_BIT_CHECK(machine->registers->flags, TRK8_CARRY_FLAG_INDEX)) {
         uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
         uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
@@ -479,7 +467,7 @@ void trk8_jc(trk8_machine_t* machine, uint8_t operands_type) {
     }
 }
 
-void trk8_jz(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_jz(trk8_machine_t* machine, const uint8_t operands_type) {
     if (TRK8_BIT_CHECK(machine->registers->flags, TRK8_ZERO_FLAG_INDEX)) {
         uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
         uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
@@ -493,6 +481,6 @@ void trk8_jz(trk8_machine_t* machine, uint8_t operands_type) {
     }
 }
 
-void trk8_hlt(trk8_machine_t* machine, uint8_t operands_type) {
+void trk8_hlt(trk8_machine_t* machine, const uint8_t operands_type) {
     machine->state = TRK8_STATE_HALTED;
 }

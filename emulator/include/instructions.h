@@ -6,7 +6,7 @@
 
 #ifndef TRK8_DECLARE_INSTRUCTION
     #define TRK8_DECLARE_INSTRUCTION(_instruction) \
-        void trk8_##_instruction(trk8_machine_t* machine, uint8_t operands_type)
+        void trk8_##_instruction(trk8_machine_t* machine, const uint8_t operands_type)
 #endif
 
 #ifndef TRK8_INSTRUCTIONS
