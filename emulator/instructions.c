@@ -69,34 +69,29 @@ void trk8_lda(trk8_machine_t* machine, const uint8_t operands_type) {
 }
 
 void trk8_stb(trk8_machine_t* machine, const uint8_t operands_type) {
+    memory_increment_program_counter(machine->memory, 1);
+
     uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
     uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
 
     uint16_t address = TRK8_WORD(address_high, address_low);
 
-    memory_increment_program_counter(machine->memory, 1);
+    uint8_t source = memory_fetch_byte(
+        *machine->memory,
+        memory_get_program_counter(*machine->memory)
+    );
 
     switch (operands_type) {
         case TRK8_OPERANDS_TYPE_IMM8: {
-            uint8_t data = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            memory_write_byte(machine->memory, address, data);
+            memory_write_byte(machine->memory, address, source);
 
             break;
         }
 
         case TRK8_OPERANDS_TYPE_REGISTER: {
-            uint8_t register_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
+            uint8_t source_data = registers_get(*machine->registers, source);
 
-            uint8_t register_data = registers_get(*machine->registers, register_id);
-
-            memory_write_byte(machine->memory, address, register_data);
+            memory_write_byte(machine->memory, address, source_data);
 
             break;
         }
@@ -106,11 +101,6 @@ void trk8_stb(trk8_machine_t* machine, const uint8_t operands_type) {
 }
 
 void trk8_ldb(trk8_machine_t* machine, const uint8_t operands_type) {
-    uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-    uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
-
-    uint16_t address = TRK8_WORD(address_high, address_low);
-
     memory_increment_program_counter(machine->memory, 1);
 
     uint8_t register_id = memory_fetch_byte(
@@ -118,11 +108,16 @@ void trk8_ldb(trk8_machine_t* machine, const uint8_t operands_type) {
         memory_get_program_counter(*machine->memory)
     );
 
-    uint8_t data = memory_fetch_byte(*machine->memory, address);
+    uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
+    uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
 
-    registers_set(machine->registers, register_id, data);
+    uint16_t address = TRK8_WORD(address_high, address_low);
 
-    registers_update_flags(machine->registers, data);
+    uint8_t source = memory_fetch_byte(*machine->memory, address);
+
+    registers_set(machine->registers, register_id, source);
+
+    registers_update_flags(machine->registers, source);
 
     memory_increment_program_counter(machine->memory, 1);
 }
