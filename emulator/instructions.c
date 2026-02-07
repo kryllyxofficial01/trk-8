@@ -123,31 +123,29 @@ void trk8_ldb(trk8_machine_t* machine, const uint8_t operands_type) {
 }
 
 void trk8_push(trk8_machine_t* machine, const uint8_t operands_type) {
-    uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
+    memory_increment_program_counter(machine->memory, 1);
 
+    uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
     uint16_t stack_address = TRK8_STACK_START + stack_pointer;
 
-    memory_increment_program_counter(machine->memory, 1);
+    uint8_t source = memory_fetch_byte(
+        *machine->memory,
+        memory_get_program_counter(*machine->memory)
+    );
 
     switch (operands_type) {
         case TRK8_OPERANDS_TYPE_IMM8: {
-            uint8_t data = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
+            memory_write_byte(machine->memory, stack_address, source);
 
-            memory_write_byte(machine->memory, stack_address, data);
+            break;
         }
 
         case TRK8_OPERANDS_TYPE_REGISTER: {
-            uint8_t register_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
+            uint8_t source_data = registers_get(*machine->registers, source);
 
-            uint8_t register_data = registers_get(*machine->registers, register_id);
+            memory_write_byte(machine->memory, stack_address, source_data);
 
-            memory_write_byte(machine->memory, stack_address, register_data);
+            break;
         }
     }
 
@@ -157,10 +155,6 @@ void trk8_push(trk8_machine_t* machine, const uint8_t operands_type) {
 }
 
 void trk8_pop(trk8_machine_t* machine, const uint8_t operands_type) {
-    uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
-
-    uint16_t stack_address = TRK8_STACK_START + stack_pointer;
-
     memory_increment_program_counter(machine->memory, 1);
 
     uint8_t register_id = memory_fetch_byte(
@@ -168,11 +162,14 @@ void trk8_pop(trk8_machine_t* machine, const uint8_t operands_type) {
         memory_get_program_counter(*machine->memory)
     );
 
-    uint8_t data = memory_fetch_byte(*machine->memory, stack_address);
+    uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
+    uint16_t stack_address = TRK8_STACK_START + stack_pointer;
 
-    registers_set(machine->registers, register_id, data);
+    uint8_t source = memory_fetch_byte(*machine->memory, stack_address);
 
-    registers_update_flags(machine->registers, data);
+    registers_set(machine->registers, register_id, source);
+
+    registers_update_flags(machine->registers, source);
 
     registers_set(machine->registers, TRK8_REGISTER_SP, stack_pointer + 1);
 
