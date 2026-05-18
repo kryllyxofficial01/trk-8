@@ -19,9 +19,9 @@
 0x64 -> cmp %r, $i8  : Compare*** [ f = r1 - i8 ]
 0x66 -> cmp %r1, %r2 : Compare*** [ f = r1 - r2 ]
 0x68 -> jmp          : Unconditional Jump [ pc = ((ah << 8) | al) ]
-0x70 -> jn           : Jump if Negative [ pc = ((ah << 8) | al), if f.n ]
-0x78 -> jc           : Jump if Carry [ pc = ((ah << 8) | al), if f.c ]
-0x80 -> jz           : Jump if Zero [ pc = ((ah << 8) | al), if f.z ]
+0x70 -> bne          : Branch if Negative [ pc = ((ah << 8) | al), if f.n ]
+0x78 -> bca          : Branch if Carry [ pc = ((ah << 8) | al), if f.c ]
+0x80 -> bze          : Branch if Zero [ pc = ((ah << 8) | al), if f.z ]
 0x88 -> hlt          : Halt
 
 *   Updates flags based on result
@@ -42,15 +42,13 @@ Flags (4-bit): f -> - Z C N
                     | +----- Zero
                     +------- (unused)
 
-Program Counter* (16-bit, stored in memory): pc
+Program Counter* (16-bit): pc
 
-* Modified internally, only accessible to the programmer
-  through select instructions
+* Modified indirectly by select instructions
 
 ======================== Memory Layout ========================
 Multi-byte values are stored in little-endian format
 
 0x0000-0x7fff: Program Memory
 0x8000-0x80ff: Stack (LIFO)
-0x8100-0xfffd: General Purpose
-0xfffe-0xffff: Program Counter
+0x8100-0xffff: General Purpose
