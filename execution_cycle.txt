@@ -1,0 +1,32 @@
+cycle #1: read in instruction type
+cycle #2: read in operand #1
+cycle #3*: read in operand #2
+cycle #4: perform operation
+
+* if exists
+
+----------------------------------------------
+
+cycle #1 flags:
+    - enable PC read access
+    - enable IR write access
+
+if ALU operation,
+    cycle #2 flags:
+        - enable memory read access
+        - enable temp register write access
+
+    cycle #3 flags:
+        - enable temp register read access
+        - enable read access for register index stored in temp register
+        - enable ALU input A register write access
+
+    cycle #4 flags:
+        if second operand is 8-bit immediate,
+            - enable memory read access
+            - enable ALU input B register write access
+
+    cycle #5:
+        - enable ALU output access
+        - enable temp register read access
+        - enable write access for register index stored in temp register

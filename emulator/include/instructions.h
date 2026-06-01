@@ -6,7 +6,7 @@
 
 #ifndef TRK8_DECLARE_INSTRUCTION
     #define TRK8_DECLARE_INSTRUCTION(_instruction) \
-        void trk8_##_instruction(trk8_machine_t* machine, uint8_t operands_type)
+        void trk8_##_instruction(trk8_machine_t* machine, const uint8_t operands_type)
 #endif
 
 #ifndef TRK8_INSTRUCTIONS
@@ -18,7 +18,7 @@
         _decl(ldb); \
         _decl(push); \
         _decl(pop); \
-        _decl(add); \
+        _decl(adc); \
         _decl(and); \
         _decl(or); \
         _decl(not); \
@@ -38,7 +38,7 @@ enum _TRK8_INSTRUCTION_INDEXES {
     TRK8_INSTRUCTION_LDB,
     TRK8_INSTRUCTION_PUSH,
     TRK8_INSTRUCTION_POP,
-    TRK8_INSTRUCTION_ADD,
+    TRK8_INSTRUCTION_ADC,
     TRK8_INSTRUCTION_AND,
     TRK8_INSTRUCTION_OR,
     TRK8_INSTRUCTION_NOT,
