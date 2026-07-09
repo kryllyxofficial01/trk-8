@@ -1,50 +1,78 @@
-======================= Instruction Set =======================
-0x08 -> nop          : No Operation
-0x14 -> mov %r, $i8  : Move* [ r = i8 ]
-0x16 -> mov %r1, %r2 : Move* [ r1 = r2 ]
-0x1a -> lda $i16     : Load Address** [ ((ah << 8) | al) = i16 ]
-0x21 -> stb $i8      : Store Byte [ ((ah << 8) | al) = i8 ]
-0x23 -> stb %r       : Store Byte [ ((ah << 8) | al) = r ]
-0x2b -> ldb %r       : Load Byte* [ r = ((ah << 8) | al) ]
-0x31 -> push $i8     : Push to stack [ sp-- = r ]
-0x33 -> push %r      : Push to stack [ sp-- = r ]
-0x3b -> pop %r       : Pop from stack* [ r = ++sp ]
-0x44 -> adc %r, $i8  : Add with carry* [ r += i8 + f.c ]
-0x46 -> adc %r1, %r2 : Add with carry* [ r1 += r2 + f.c ]
-0x4c -> and %r, $i8  : Bitwise AND* [ r &= i8 ]
-0x4e -> and %r1, %r2 : Bitwise AND* [ r1 &= r2 ]
-0x54 -> or %r, $i8   : Bitwise OR* [ r |= i8 ]
-0x56 -> or %r1, %r2  : Bitwise OR* [ r1 |= r2 ]
-0x5b -> not %r       : Bitwise NOT* [ r = ~r ]
-0x64 -> cmp %r, $i8  : Compare*** [ f = r1 - i8 ]
-0x66 -> cmp %r1, %r2 : Compare*** [ f = r1 - r2 ]
-0x68 -> jmp          : Unconditional Jump [ pc = ((ah << 8) | al) ]
-0x70 -> bne          : Branch if Negative [ pc = ((ah << 8) | al), if f.n ]
-0x78 -> bca          : Branch if Carry [ pc = ((ah << 8) | al), if f.c ]
-0x80 -> bze          : Branch if Zero [ pc = ((ah << 8) | al), if f.z ]
-0x88 -> hlt          : Halt
+============================ Instruction Set ============================
+nop         : No Operation
+mov r, r/i8 : Move [ r = r/i8 ]
+lda         : Load Address [ ah,al = b,a ]
+stb r/i8    : Store Byte [ r/i8 -> ah,al ]
+ldb r       : Load Byte [ ah,al -> r ]
+push r/i8   : Push to stack [ sp-- = r/i8 ]
+pop r       : Pop from stack [ r = ++sp ]
+adc         : Add with carry* [ x = a + b + f.carry]
+and         : Bitwise AND* [ x = a & b]
+or          : Bitwise OR* [ x = a | b ]
+not         : Bitwise NOT* [ x = ~a]
+cmp         : Compare** [ f = a - b]
+jmp         : Unconditional Jump [ pch,pcl = ah,al ]
+bne         : Branch if Negative [ pch,pcl = ah,al if f.negative]
+bca         : Branch if Carry [ pch,pcl = ah,al if f.carry ]
+bze         : Branch if Zero [ pch,pcl = ah,al if f.zero ]
+hlt         : Halt
 
-*   Updates flags based on result
-**  Any label names passed will be resolved to corresponding address during assembly
-*** Updates flag register without storing the result
+*  ALU operation; updates flags based on result
+** Result is discarded; flags are still updated
 
-========================== Registers ==========================
-General Purpose (8-bit): a, b, c, d
+=========================== Instruction Format ===========================
+
+Opcode Bits: CCIIIIRR
+    CC   = 2-bit index for DATA, ARITHMETIC, MEMORY, or MISC category
+    IIII = 4-bit instruction ID (see below)
+    RR   = 2-bit index of the first specified register
+
+Categories:
+    DATA (CC = 0b00):
+        mov  -> IIII = 0b0001
+        push -> IIII = 0b0010
+        pop  -> IIII = 0b0011
+
+    ARITHMETIC (CC = 0b01):
+        adc -> IIII = 0b0001
+        and -> IIII = 0b0010
+        or  -> IIII = 0b0011
+        not -> IIII = 0b0100
+        cmp -> IIII = 0b0101
+
+    MEMORY (CC = 0b10):
+        lda -> IIII = 0b0001
+        stb -> IIII = 0b0010
+        ldb -> IIII = 0b0011
+        jmp -> IIII = 0b0100
+        bne -> IIII = 0b0101
+        bca -> IIII = 0b0110
+        bze -> IIII = 0b0111
+
+    MISC (CC = 0b11):
+        nop -> IIII = 0b0001
+        hlt -> IIII = 0b0010
+
+============================= Registers =============================
+General Purpose (8-bit): a, b, c, x
+    - "a" and "b" are always used for ALU inputs
+    - "x" always stores the result of ALU operations
 
 Stack Pointer (8-bit): sp
 
-Address (8-bit): al, ah
-
 Flags (4-bit): f -> - Z C N
                     | | | |
-                    | | | +- Negative
+                    | | | +- Negative (LSB)
                     | | +--- Carry
                     | +----- Zero
-                    +------- (unused)
+                    +------- (unused) (MSB)
 
-Program Counter* (16-bit): pc
+Address* (8-bit): al, ah
 
-* Modified indirectly by select instructions
+Program Counter* (8-bit): pcl, pch
+
+* Stored internally as two 8-bit registers, but combined
+  when put onto the address bus for use with memory access
 
 ======================== Memory Layout ========================
 Multi-byte values are stored in little-endian format
