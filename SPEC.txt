@@ -20,42 +20,43 @@ hlt         : Halt
 *  ALU operation; updates flags based on result
 ** Result is discarded; flags are still updated
 
-=========================== Instruction Format ===========================
+============================ Instruction Format ============================
 
-Opcode Bits: CCIIIIRR
-    CC   = 2-bit index for DATA, ARITHMETIC, MEMORY, or MISC category
-    IIII = 4-bit instruction ID (see below)
-    RR   = 2-bit index of the first specified register
+Opcode Bits: CCIIIMRR
+    CC  = 2-bit index for DATA, ARITHMETIC, MEMORY, or MISC category
+    III = 3-bit instruction ID (see below)
+    M   = 1-bit switch stating if the instruction has an immediate operand
+    RR  = 2-bit index of the first specified register
 
 Categories:
     DATA (CC = 0b00):
-        mov  -> IIII = 0b0001
-        push -> IIII = 0b0010
-        pop  -> IIII = 0b0011
+        mov  -> III = 0b001
+        push -> III = 0b010
+        pop  -> III = 0b011
 
     ARITHMETIC (CC = 0b01):
-        adc -> IIII = 0b0001
-        and -> IIII = 0b0010
-        or  -> IIII = 0b0011
-        not -> IIII = 0b0100
-        cmp -> IIII = 0b0101
+        adc -> III = 0b001
+        and -> III = 0b010
+        or  -> III = 0b011
+        not -> III = 0b100
+        cmp -> III = 0b101
 
     MEMORY (CC = 0b10):
-        lda -> IIII = 0b0001
-        stb -> IIII = 0b0010
-        ldb -> IIII = 0b0011
-        jmp -> IIII = 0b0100
-        bne -> IIII = 0b0101
-        bca -> IIII = 0b0110
-        bze -> IIII = 0b0111
+        lda -> III = 0b001
+        stb -> III = 0b010
+        ldb -> III = 0b011
+        jmp -> III = 0b100
+        bne -> III = 0b101
+        bca -> III = 0b110
+        bze -> III = 0b111
 
     MISC (CC = 0b11):
-        nop -> IIII = 0b0001
-        hlt -> IIII = 0b0010
+        nop -> III = 0b001
+        hlt -> III = 0b010
 
 ============================= Registers =============================
 General Purpose (8-bit): a, b, c, x
-    - "a" and "b" are always used for ALU inputs
+    - "a" and "b" are always used for ALU operands
     - "x" always stores the result of ALU operations
 
 Stack Pointer (8-bit): sp
