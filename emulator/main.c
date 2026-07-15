@@ -1,18 +1,19 @@
-#include "include/cpu.h"
+#include <stdlib.h>
+
+#include "include/memory.h"
 
 int main(void) {
-    #define PROGRAM_LENGTH (6)
-
-    uint8_t program[PROGRAM_LENGTH] = {
-        0x14, 0x00, 0xff, // mov %a, 0xff
-        0x44, 0x00, 0x01  // adc %a, 0x01 (should enable the carry flag)
+    uint8_t program[] = {
+        0b00001100, 0b00010011 // mov %a, 19
     };
 
-    trk8_machine_t machine;
+    uint16_t program_length = sizeof(program) / sizeof(uint8_t);
 
-    trk8_init(&machine);
+    trk8_memory_t memory = memory_init();
 
-    memory_write_program(machine.memory, program, PROGRAM_LENGTH);
+    memory_load_program(&memory, program, program_length);
 
-    cpu_run(&machine);
+    memory_dump(memory, 0, program_length);
+
+    return EXIT_SUCCESS;
 }
