@@ -51,6 +51,7 @@ trk8_memory_t memory_init(void);
 void memory_load_program(trk8_memory_t* memory, const uint8_t* program, const uint16_t program_length);
 
 uint8_t memory_read_byte(const trk8_memory_t memory, const uint16_t address);
+void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint8_t byte);
 
 void memory_dump(const trk8_memory_t memory, const uint16_t start_address, const uint16_t end_address);
 
