@@ -3,7 +3,7 @@ nop         : No OPeration
 mov r, r/i8 : MOVe [ r = r/i8 ]
 xsp         : eXchange Stack Pointer [ a = sp, sp = a ]
 xcf         : eXChange Flags*** [ a = f, f = a ]
-xca 0/1     : eXChange Address byte**** [ a = al/ah, al/ah = a ]
+xca         : eXChange Address [ a,b = ah,al, ah,al = a,b ]
 lda         : Load Address [ ah,al = b,a ]
 stb r/i8    : Store Byte [ r/i8 -> ah,al ]
 ldb r       : Load Byte [ ah,al -> r ]
@@ -23,7 +23,6 @@ hlt         : Halt
 *    Updates flags
 **   Result is discarded; flags are still updated
 ***  Bottom nibble is used
-**** 0 = al, 1 = ah
 
 ============================ Instruction Format ============================
 
