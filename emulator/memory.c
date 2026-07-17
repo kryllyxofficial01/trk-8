@@ -1,6 +1,6 @@
 #include "include/memory.h"
 
-inline trk8_memory_t memory_init(void) {
+trk8_memory_t memory_init(void) {
     trk8_memory_t memory;
 
     for (uint16_t i = TRK8_PROGRAM_MEMORY_START; i <= TRK8_PROGRAM_MEMORY_END; i++) {

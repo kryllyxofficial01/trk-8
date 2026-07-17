@@ -46,7 +46,7 @@ typedef struct _TRK8_MEMORY {
     uint8_t general_purpose[TRK8_GENERAL_PURPOSE_LENGTH];
 } trk8_memory_t;
 
-inline trk8_memory_t memory_init(void);
+trk8_memory_t memory_init(void);
 
 void memory_load_program(trk8_memory_t* memory, const uint8_t* program, const uint16_t program_length);
 
