@@ -3,22 +3,21 @@ nop         : No OPeration
 mov r, r/i8 : MOVe [ r = r/i8 ]
 xsp         : eXchange Stack Pointer [ a = sp, sp = a ]
 xcf         : eXChange Flags*** [ a = f, f = a ]
-xca         : eXChange Address [ a,b = ah,al, ah,al = a,b ]
-lda         : Load Address [ ah,al = b,a ]
-stb r/i8    : Store Byte [ r/i8 -> ah,al ]
-ldb r       : Load Byte [ ah,al -> r ]
-push r/i8   : Push to stack [ sp-- = r/i8 ]
-pop r       : Pop from stack [ r = ++sp ]
-adc         : Add with carry* [ x = a + b + f.carry]
-and         : Bitwise AND* [ x = a & b]
-or          : Bitwise OR* [ x = a | b ]
-not         : Bitwise NOT* [ x = ~a]
-cmp         : Compare** [ f = a - b]
-jmp         : Unconditional Jump [ pch,pcl = ah,al ]
-bne         : Branch if Negative [ pch,pcl = ah,al if f.negative]
-bca         : Branch if Carry [ pch,pcl = ah,al if f.carry ]
-bze         : Branch if Zero [ pch,pcl = ah,al if f.zero ]
-hlt         : Halt
+xca         : eXChange Address [ a,b = al,ah, al,ah = a,b ]
+stb r/i8    : STore Byte [ r/i8 -> al,ah ]
+ldb r       : LoaD Byte [ al,ah -> r ]
+push r/i8   : PUSH to stack [ sp-- = r/i8 ]
+pop r       : POP from stack [ r = ++sp ]
+adc         : ADd with Carry* [ x = a + b + f.carry]
+and         : bitwise AND* [ x = a & b]
+or          : bitwise OR* [ x = a | b ]
+not         : bitwise NOT* [ x = ~a]
+cmp         : CoMPare** [ f = a - b]
+jmp         : unconditional JuMP [ pcl,pch = al,ah ]
+bne         : Branch if NEgative [ pcl,pch = al,ah if f.negative]
+bca         : Branch if CArry [ pcl,pch = al,ah if f.carry ]
+bze         : Branch if ZEro [ pcl,pch = al,ah if f.zero ]
+hlt         : HaLT
 
 *    Updates flags
 **   Result is discarded; flags are still updated
@@ -49,13 +48,12 @@ Categories:
         cmp -> III = 0b101
 
     MEMORY (CC = 0b10):
-        lda -> III = 0b001
-        stb -> III = 0b010
-        ldb -> III = 0b011
-        jmp -> III = 0b100
-        bne -> III = 0b101
-        bca -> III = 0b110
-        bze -> III = 0b111
+        stb -> III = 0b001
+        ldb -> III = 0b010
+        jmp -> III = 0b011
+        bne -> III = 0b100
+        bca -> III = 0b101
+        bze -> III = 0b110
 
     MISC (CC = 0b11):
         nop -> III = 0b001
