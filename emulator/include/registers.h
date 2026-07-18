@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include "utils.h"
+
 typedef struct _TRK8_REGISTERS {
     uint8_t a;
     uint8_t b;
@@ -10,7 +12,7 @@ typedef struct _TRK8_REGISTERS {
     uint8_t x;
 
     uint8_t sp;
-    
+
     uint8_t f : 4;
 
     uint8_t al, ah;
@@ -39,5 +41,9 @@ trk8_registers_t registers_init(void);
 
 uint8_t registers_get(const trk8_registers_t registers, const trk8_register_id_t register_id);
 void registers_set(trk8_registers_t* registers, const trk8_register_id_t register_id, const uint8_t value);
+
+uint16_t registers_get_pc_word(const trk8_registers_t registers);
+
+void registers_increment_pc(trk8_registers_t* registers, uint16_t amount);
 
 #endif

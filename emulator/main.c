@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "include/memory.h"
+#include "include/machine.h"
 
 int main(void) {
     uint8_t program[] = {
@@ -9,11 +9,11 @@ int main(void) {
 
     uint16_t program_length = sizeof(program) / sizeof(uint8_t);
 
-    trk8_memory_t memory = memory_init();
+    trk8_machine_t machine = machine_init();
 
-    memory_load_program(&memory, program, program_length);
+    memory_load_program(&machine.memory, program, program_length);
 
-    memory_dump(memory, 0, program_length);
+    machine_run(&machine);
 
     return EXIT_SUCCESS;
 }
