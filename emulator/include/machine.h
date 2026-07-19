@@ -5,6 +5,8 @@
 
 #include "registers.h"
 #include "memory.h"
+#include "instructions.h"
+#include "opcode.h"
 #include "utils.h"
 
 typedef struct _TRK8_MACHINE_STATE {
@@ -23,5 +25,9 @@ trk8_machine_t machine_init(void);
 trk8_machine_state_t machine_state_init(void);
 
 void machine_run(trk8_machine_t* machine);
+
+trk8_opcode_t parse_opcode(uint8_t opcode);
+
+void execute_opcode(trk8_machine_t* machine, trk8_opcode_t opcode);
 
 #endif

@@ -5,60 +5,48 @@
 #include <stdbool.h>
 
 #include "registers.h"
+#include "memory.h"
+#include "opcode.h"
 
-typedef enum _TRK8_INSTRUCTION_CATEGORY {
-    TRK8_INST_CAT_DATA,
-    TRK8_INST_CAT_ARITHMETIC,
-    TRK8_INST_CAT_MEMORY,
-    TRK8_INST_CAT_MISC
-} trk8_inst_cat_t;
+#ifndef TRK8_INSTRUCTION_DECL
+    #define TRK8_INSTRUCTION_DECL(_mnemonic, ...) void instruction_##_mnemonic(__VA_ARGS__)
+#endif
 
-typedef enum _TRK8_DATA_INSTRUCTION_ID {
-    TRK8_DATA_INST_MOV = 1,
-    TRK8_DATA_INST_XSP,
-    TRK8_DATA_INST_XCF,
-    TRK8_DATA_INST_XCA,
-    TRK8_DATA_INST_PUSH,
-    TRK8_DATA_INST_POP
-} trk8_data_inst_id_t;
+#ifndef TRK8_INSTRUCTIONS
+    #define TRK8_INSTRUCTIONS(_decl, ...) \
+        _decl(nop, __VA_ARGS__); \
+        _decl(mov, __VA_ARGS__); \
+        _decl(xsp, __VA_ARGS__); \
+        _decl(xcf, __VA_ARGS__); \
+        _decl(xca, __VA_ARGS__); \
+        _decl(stb, __VA_ARGS__); \
+        _decl(ldb, __VA_ARGS__); \
+        _decl(push, __VA_ARGS__); \
+        _decl(pop, __VA_ARGS__); \
+        _decl(adc, __VA_ARGS__); \
+        _decl(and, __VA_ARGS__); \
+        _decl(or, __VA_ARGS__); \
+        _decl(not, __VA_ARGS__); \
+        _decl(cmp, __VA_ARGS__); \
+        _decl(jmp, __VA_ARGS__); \
+        _decl(bne, __VA_ARGS__); \
+        _decl(bca, __VA_ARGS__); \
+        _decl(bze, __VA_ARGS__); \
+        _decl(hlt, __VA_ARGS__)
+#endif
 
-typedef enum _TRK8_ARITHMETIC_INSTRUCTION_ID {
-    TRK8_ARITH_INST_ADC = 1,
-    TRK8_ARITH_INST_AND,
-    TRK8_ARITH_INST_OR,
-    TRK8_ARITH_INST_NOT,
-    TRK8_ARITH_INST_CMP
-} trk8_arith_inst_id_t;
+void execute_data_instruction(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode);
+void execute_arithmetic_instruction(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode);
+void execute_memory_instruction(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode);
+void execute_misc_instruction(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode);
 
-typedef enum _TRK8_MEMORY_INSTRUCTION_ID {
-    TRK8_MEMORY_INST_STB = 1,
-    TRK8_MEMORY_INST_LDB,
-    TRK8_MEMORY_INST_JMP,
-    TRK8_MEMORY_INST_BNE,
-    TRK8_MEMORY_INST_BCA,
-    TRK8_MEMORY_INST_BZE
-} trk8_memory_inst_id_t;
+TRK8_INSTRUCTIONS(
+    TRK8_INSTRUCTION_DECL,
 
-typedef enum _TRK8_MISC_INSTRUCTION_ID {
-    TRK8_MISC_INST_NOP = 1,
-    TRK8_MISC_INST_HLT
-} trk8_misc_inst_id_t;
-
-typedef struct _TRK8_OPCODE {
-    trk8_inst_cat_t category;
-
-    union _OPCODE_INSTRUCTRION_ID {
-        trk8_data_inst_id_t data_id;
-        trk8_arith_inst_id_t arithmetic_id;
-        trk8_memory_inst_id_t memory_id;
-        trk8_misc_inst_id_t misc_id;
-    } instruction_id;
-
-    bool has_immediate;
-
-    trk8_register_id_t first_register_id;
-} trk8_opcode_t;
-
-trk8_opcode_t parse_opcode(uint8_t opcode);
+    trk8_registers_t* registers,
+    trk8_memory_t* memory,
+    bool has_immediate,
+    const trk8_register_id_t first_register_id
+);
 
 #endif
