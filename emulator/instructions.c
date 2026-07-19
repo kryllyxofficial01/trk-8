@@ -40,7 +40,7 @@ void execute_misc_instruction(trk8_registers_t* registers, trk8_memory_t* memory
 }
 
 void instruction_nop(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
-
+    asm volatile("nop");
 }
 
 void instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {

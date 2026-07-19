@@ -4,7 +4,8 @@
 
 int main(void) {
     uint8_t program[] = {
-        0b00001100, 0b00010011 // mov %a, 19
+        0b00001100, 0b00010011, // mov %a, 19
+        0b00001101, 0b00000110  // mov %b, 6
     };
 
     uint16_t program_length = sizeof(program) / sizeof(uint8_t);
