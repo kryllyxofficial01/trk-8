@@ -63,6 +63,13 @@ void registers_set(trk8_registers_t* registers, const trk8_register_id_t registe
     }
 }
 
+uint16_t registers_get_address_word(const trk8_registers_t registers) {
+    return TRK8_MAKE_WORD(
+        registers_get(registers, TRK8_REGISTER_AL),
+        registers_get(registers, TRK8_REGISTER_AH)
+    );
+}
+
 uint16_t registers_get_pc_word(const trk8_registers_t registers) {
     return TRK8_MAKE_WORD(
         registers_get(registers, TRK8_REGISTER_PCL),
