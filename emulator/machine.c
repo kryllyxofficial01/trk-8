@@ -6,12 +6,16 @@ trk8_machine_t machine_init(void) {
     machine.state = machine_state_init();
 
     machine.memory = memory_init();
+
+    return machine;
 }
 
 trk8_machine_state_t machine_state_init(void) {
     trk8_machine_state_t machine_state;
 
     machine_state.registers = registers_init();
+
+    registers_set(&machine_state.registers, TRK8_REGISTER_SP, 0xff);
 
     registers_set(
         &machine_state.registers,

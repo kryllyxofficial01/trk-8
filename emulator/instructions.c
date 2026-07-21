@@ -157,11 +157,30 @@ void instruction_ldb(trk8_registers_t* registers, trk8_memory_t* memory, bool ha
 }
 
 void instruction_push(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    uint8_t value;
 
+    if (has_immediate) {
+        registers_increment_pc(registers, 1);
+
+        value = memory_read_byte(*memory, registers_get_pc_word(*registers));
+    }
+    else {
+        value = registers_get(*registers, first_register_id);
+    }
+
+    memory_write_byte(memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP), value);
+
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) - 1);
 }
 
 void instruction_pop(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) + 1);
 
+    registers_set(
+        registers,
+        first_register_id,
+        memory_read_byte(*memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP))
+    );
 }
 
 void instruction_adc(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
