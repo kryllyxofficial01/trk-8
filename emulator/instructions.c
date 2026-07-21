@@ -4,10 +4,10 @@ void execute_data_instruction(trk8_registers_t* registers, trk8_memory_t* memory
     switch (opcode.instruction_id.data_id) {
         case TRK8_DATA_INST_MOV: instruction_mov(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
         case TRK8_DATA_INST_XSP: instruction_xsp(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
-        case TRK8_DATA_INST_XCF: instruction_mov(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
-        case TRK8_DATA_INST_XCA: instruction_mov(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
-        case TRK8_DATA_INST_PUSH: instruction_mov(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
-        case TRK8_DATA_INST_POP: instruction_mov(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
+        case TRK8_DATA_INST_XCF: instruction_xcf(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
+        case TRK8_DATA_INST_XCA: instruction_xca(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
+        case TRK8_DATA_INST_PUSH: instruction_push(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
+        case TRK8_DATA_INST_POP: instruction_pop(registers, memory, opcode.has_immediate, opcode.first_register_id); break;
     }
 }
 
@@ -56,15 +56,81 @@ void instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, bool ha
 }
 
 void instruction_xsp(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    registers_set(
+        registers,
+        TRK8_REGISTER_A,
+        registers_get(*registers, TRK8_REGISTER_A) + registers_get(*registers, TRK8_REGISTER_SP)
+    );
 
+    registers_set(
+        registers,
+        TRK8_REGISTER_SP,
+        registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_SP)
+    );
+
+    registers_set(
+        registers,
+        TRK8_REGISTER_A,
+        registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_SP)
+    );
 }
 
 void instruction_xcf(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    registers_set(
+        registers,
+        TRK8_REGISTER_A,
+        registers_get(*registers, TRK8_REGISTER_A) + registers_get(*registers, TRK8_REGISTER_F)
+    );
 
+    registers_set(
+        registers,
+        TRK8_REGISTER_F,
+        registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_F)
+    );
+
+    registers_set(
+        registers,
+        TRK8_REGISTER_A,
+        registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_F)
+    );
 }
 
 void instruction_xca(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    registers_set(
+        registers,
+        TRK8_REGISTER_A,
+        registers_get(*registers, TRK8_REGISTER_A) + registers_get(*registers, TRK8_REGISTER_AL)
+    );
 
+    registers_set(
+        registers,
+        TRK8_REGISTER_AL,
+        registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_AL)
+    );
+
+    registers_set(
+        registers,
+        TRK8_REGISTER_A,
+        registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_AL)
+    );
+
+    registers_set(
+        registers,
+        TRK8_REGISTER_B,
+        registers_get(*registers, TRK8_REGISTER_B) + registers_get(*registers, TRK8_REGISTER_AH)
+    );
+
+    registers_set(
+        registers,
+        TRK8_REGISTER_AH,
+        registers_get(*registers, TRK8_REGISTER_B) - registers_get(*registers, TRK8_REGISTER_AH)
+    );
+
+    registers_set(
+        registers,
+        TRK8_REGISTER_B,
+        registers_get(*registers, TRK8_REGISTER_B) - registers_get(*registers, TRK8_REGISTER_AH)
+    );
 }
 
 void instruction_stb(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
