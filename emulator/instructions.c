@@ -49,20 +49,10 @@ void instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, bool ha
     uint8_t second_operand = memory_read_byte(*memory, registers_get_pc_word(*registers));
 
     if (!has_immediate) {
-        switch (second_operand) {
-            case TRK8_REGISTER_A: second_operand = registers->a; break;
-            case TRK8_REGISTER_B: second_operand = registers->b; break;
-            case TRK8_REGISTER_C: second_operand = registers->c; break;
-            case TRK8_REGISTER_X: second_operand = registers->x; break;
-        }
+        second_operand = registers_get(*registers, second_operand);
     }
 
-    switch (first_register_id) {
-        case TRK8_REGISTER_A: registers->a = second_operand; break;
-        case TRK8_REGISTER_B: registers->b = second_operand; break;
-        case TRK8_REGISTER_C: registers->c = second_operand; break;
-        case TRK8_REGISTER_X: registers->x = second_operand; break;
-    }
+    registers_set(registers, first_register_id, second_operand);
 }
 
 void instruction_xsp(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {

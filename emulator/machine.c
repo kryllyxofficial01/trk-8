@@ -13,8 +13,17 @@ trk8_machine_state_t machine_state_init(void) {
 
     machine_state.registers = registers_init();
 
-    machine_state.registers.pcl = TRK8_GET_LOW_BYTE(TRK8_PROGRAM_MEMORY_START);
-    machine_state.registers.pch = TRK8_GET_HIGH_BYTE(TRK8_PROGRAM_MEMORY_START);
+    registers_set(
+        &machine_state.registers,
+        TRK8_REGISTER_PCL,
+        TRK8_GET_LOW_BYTE(TRK8_PROGRAM_MEMORY_START)
+    );
+
+    registers_set(
+        &machine_state.registers,
+        TRK8_REGISTER_PCH,
+        TRK8_GET_HIGH_BYTE(TRK8_PROGRAM_MEMORY_START)
+    );
 
     machine_state.halted = false;
 
