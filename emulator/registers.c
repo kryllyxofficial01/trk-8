@@ -63,6 +63,33 @@ void registers_set(trk8_registers_t* registers, const trk8_register_id_t registe
     }
 }
 
+void registers_update_flags(trk8_registers_t* registers, const uint16_t value) {
+    uint8_t flags = registers_get(*registers, TRK8_REGISTER_F);
+
+    if ((uint8_t) value == 0x00) {
+        TRK8_BIT_SET(flags, TRK8_FLAGS_ZERO_BIT_INDEX);
+    }
+    else {
+        TRK8_BIT_UNSET(flags, TRK8_FLAGS_ZERO_BIT_INDEX);
+    }
+
+    if (value > UINT8_MAX) {
+        TRK8_BIT_SET(flags, TRK8_FLAGS_CARRY_BIT_INDEX);
+    }
+    else {
+        TRK8_BIT_UNSET(flags, TRK8_FLAGS_CARRY_BIT_INDEX);
+    }
+
+    if (TRK8_BIT_GET(value, TRK8_NEGATIVE_BIT_INDEX)) {
+        TRK8_BIT_SET(flags, TRK8_FLAGS_NEGATIVE_BIT_INDEX);
+    }
+    else {
+        TRK8_BIT_UNSET(flags, TRK8_FLAGS_NEGATIVE_BIT_INDEX);
+    }
+
+    registers_set(registers, TRK8_REGISTER_F, flags);
+}
+
 uint16_t registers_get_address_word(const trk8_registers_t registers) {
     return TRK8_MAKE_WORD(
         registers_get(registers, TRK8_REGISTER_AL),

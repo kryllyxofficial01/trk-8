@@ -5,6 +5,22 @@
 
 #include "utils.h"
 
+#ifndef TRK8_FLAGS_ZERO_BIT_INDEX
+    #define TRK8_FLAGS_ZERO_BIT_INDEX (2)
+#endif
+
+#ifndef TRK8_FLAGS_CARRY_BIT_INDEX
+    #define TRK8_FLAGS_CARRY_BIT_INDEX (1)
+#endif
+
+#ifndef TRK8_FLAGS_NEGATIVE_BIT_INDEX
+    #define TRK8_FLAGS_NEGATIVE_BIT_INDEX (0)
+#endif
+
+#ifndef TRK8_NEGATIVE_BIT_INDEX
+    #define TRK8_NEGATIVE_BIT_INDEX (7)
+#endif
+
 typedef struct _TRK8_REGISTERS {
     uint8_t a;
     uint8_t b;
@@ -41,6 +57,8 @@ trk8_registers_t registers_init(void);
 
 uint8_t registers_get(const trk8_registers_t registers, const trk8_register_id_t register_id);
 void registers_set(trk8_registers_t* registers, const trk8_register_id_t register_id, const uint8_t value);
+
+void registers_update_flags(trk8_registers_t* registers, const uint16_t value);
 
 uint16_t registers_get_address_word(const trk8_registers_t registers);
 uint16_t registers_get_pc_word(const trk8_registers_t registers);

@@ -184,23 +184,46 @@ void instruction_pop(trk8_registers_t* registers, trk8_memory_t* memory, bool ha
 }
 
 void instruction_adc(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    uint8_t carry = TRK8_BIT_GET(
+        registers_get(*registers, TRK8_REGISTER_F),
+        TRK8_FLAGS_CARRY_BIT_INDEX
+    );
 
+    uint16_t value = registers_get(*registers, TRK8_REGISTER_A) + registers_get(*registers, TRK8_REGISTER_B) + carry;
+
+    registers_set(registers, TRK8_REGISTER_X, (uint8_t) value);
+
+    registers_update_flags(registers, value);
 }
 
 void instruction_and(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    uint8_t value = registers_get(*registers, TRK8_REGISTER_A) & registers_get(*registers, TRK8_REGISTER_B);
 
+    registers_set(registers, TRK8_REGISTER_X, value);
+
+    registers_update_flags(registers, value);
 }
 
 void instruction_or(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    uint8_t value = registers_get(*registers, TRK8_REGISTER_A) | registers_get(*registers, TRK8_REGISTER_B);
 
+    registers_set(registers, TRK8_REGISTER_X, value);
+
+    registers_update_flags(registers, value);
 }
 
 void instruction_not(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    uint8_t value = ~registers_get(*registers, TRK8_REGISTER_A);
 
+    registers_set(registers, TRK8_REGISTER_X, value);
+
+    registers_update_flags(registers, value);
 }
 
 void instruction_cmp(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
+    uint8_t value = registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_B);
 
+    registers_update_flags(registers, value);
 }
 
 void instruction_jmp(trk8_registers_t* registers, trk8_memory_t* memory, bool has_immediate, const trk8_register_id_t first_register_id) {
