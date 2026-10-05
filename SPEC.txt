@@ -1,9 +1,6 @@
-============================ Instruction Set ============================
+============================= Instruction Set =============================
 nop         : No OPeration
 mov r, r/i8 : MOVe [ r = r/i8 ]
-xsp         : eXchange Stack Pointer [ a = sp, sp = a ]
-xcf         : eXChange Flags*** [ a = f, f = a ]
-xca         : eXChange Address [ a,b = al,ah, al,ah = a,b ]
 stb r/i8    : STore Byte [ r/i8 -> al,ah ]
 ldb r       : LoaD Byte [ al,ah -> r ]
 push r/i8   : PUSH to stack [ sp-- = r/i8 ]
@@ -21,45 +18,91 @@ hlt         : HaLT
 
 *    Updates flags
 **   Result is discarded; flags are still updated
-***  Bottom nibble is used
 
 ============================ Instruction Format ============================
 
-Opcode Bits: CCIIIMRR
-    CC  = 2-bit index for DATA, ARITHMETIC, MEMORY, or MISC category
-    III = 3-bit instruction ID (see below)
-    M   = 1-bit switch stating if the instruction has an immediate operand
-    RR  = 2-bit index of the first specified register
+Opcode global bit mapping: CCAAAAAA
+    CC = 2 bits indicating which category the instruction belongs to
+        no operands  = 0b00
+        one operand  = 0b01
+        two operands = 0b10
 
-Categories:
-    DATA (CC = 0b00):
-        mov  -> III = 0b001
-        xsp  -> III = 0b010
-        xcf  -> III = 0b011
-        xca  -> III = 0b100
-        push -> III = 0b101
-        pop  -> III = 0b110
+    AAAAAA = 6 bits for the respective arguments of each category
 
-    ARITHMETIC (CC = 0b01):
-        adc -> III = 0b001
-        and -> III = 0b010
-        or  -> III = 0b011
-        not -> III = 0b100
-        cmp -> III = 0b101
+NO OPERANDS
+    Opcode bit mapping: 00IIIIII
+        IIIIII = 6 bits for the instruction index
+            nop = 0b000001
+            adc = 0b000010
+            and = 0b000011
+            or  = 0b000100
+            not = 0b000101
+            cmp = 0b000110
+            jmp = 0b000111
+            bne = 0b001000
+            bca = 0b001001
+            bze = 0b001010
+            hlt = 0b001011
 
-    MEMORY (CC = 0b10):
-        stb -> III = 0b001
-        ldb -> III = 0b010
-        jmp -> III = 0b011
-        bne -> III = 0b100
-        bca -> III = 0b101
-        bze -> III = 0b110
+ONE OPERAND
+    Opcode bit mapping: 01IIRRRR
+        II = 2 bits for the instruction index
+            stb  = 0b00
+            ldb  = 0b01
+            push = 0b10
+            pop  = 0b11
 
-    MISC (CC = 0b11):
-        nop -> III = 0b001
-        hlt -> III = 0b010
+        RRRR = 4 bits for the register index
+            a     = 0b0000
+            b     = 0b0001
+            c     = 0b0010
+            x     = 0b0011
+            sp    = 0b0100
+            f     = 0b0101
+            al    = 0b0110
+            ah    = 0b0111
+            pcl   = 0b1000
+            pch   = 0b1001
+            imm8* = 0b1111
 
-============================= Registers =============================
+TWO OPERANDS
+    Opcode bit mapping: 10IRRRRV XXXXXXXX
+        I = 1 bit for the instruction index
+            mov = 0b0
+
+        RRRR = 4 bits for the register index
+            a     = 0b0000
+            b     = 0b0001
+            c     = 0b0010
+            x     = 0b0011
+            sp    = 0b0100
+            f     = 0b0101
+            al    = 0b0110
+            ah    = 0b0111
+            pcl   = 0b1000
+            pch   = 0b1001
+
+        V = 1 bit for the type of the byte following the opcode
+            register index  = 0b0
+                XXXXXXXX = 8 bits for the register index
+                    a     = 0b00000000
+                    b     = 0b00000001
+                    c     = 0b00000010
+                    x     = 0b00000011
+                    sp    = 0b00000100
+                    f     = 0b00000101
+                    al    = 0b00000110
+                    ah    = 0b00000111
+                    pcl   = 0b00001000
+                    pch   = 0b00001001
+
+            8-bit immediate = 0b1
+                XXXXXXXX = 8 bits for an immediate value
+
+* special value indicating that the byte following the opcode is
+  an 8-bit immediate
+
+================================ Registers ================================
 General Purpose (8-bit): a, b, c, x
     - "a" and "b" are always used for ALU operands
     - "x" always stores the result of ALU operations
@@ -80,7 +123,7 @@ Program Counter* (8-bit): pcl, pch
 * Stored internally as two 8-bit registers, but combined
   when put onto the address bus for use with memory access
 
-======================== Memory Layout ========================
+============================== Memory Layout ==============================
 Multi-byte values are stored in little-endian format
 
 0x0000-0x7fff: Program Memory
