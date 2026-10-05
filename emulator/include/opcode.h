@@ -1,61 +1,73 @@
 #ifndef __TRK8_OPCODE_H
 #define __TRK8_OPCODE_H
 
-#include <stdbool.h>
-
 #include "registers.h"
 
-typedef enum _TRK8_INSTRUCTION_CATEGORY {
-    TRK8_INST_CAT_DATA,
-    TRK8_INST_CAT_ARITHMETIC,
-    TRK8_INST_CAT_MEMORY,
-    TRK8_INST_CAT_MISC
-} trk8_inst_cat_t;
+typedef enum _TRK8_OPCODE_CATEGORY {
+    TRK8_OPCODE_CATEGORY_NO_OPERANDS,
+    TRK8_OPCODE_CATEGORY_ONE_OPERAND,
+    TRK8_OPCODE_CATEGORY_TWO_OPERANDS
+} trk8_opc_category_t;
 
-typedef enum _TRK8_DATA_INSTRUCTION_ID {
-    TRK8_DATA_INST_MOV = 1,
-    TRK8_DATA_INST_XSP,
-    TRK8_DATA_INST_XCF,
-    TRK8_DATA_INST_XCA,
-    TRK8_DATA_INST_PUSH,
-    TRK8_DATA_INST_POP
-} trk8_data_inst_id_t;
+typedef enum _TRK8_OPCODE_ARGUMENTS_NO_OPERANDS_INSTRUCTION_ID {
+    TRK8_INSTRUCTION_ID_NOP = 1,
+    TRK8_INSTRUCTION_ID_ADC,
+    TRK8_INSTRUCTION_ID_AND,
+    TRK8_INSTRUCTION_ID_OR,
+    TRK8_INSTRUCTION_ID_NOT,
+    TRK8_INSTRUCTION_ID_CMP,
+    TRK8_INSTRUCTION_ID_JMP,
+    TRK8_INSTRUCTION_ID_BNE,
+    TRK8_INSTRUCTION_ID_BCA,
+    TRK8_INSTRUCTION_ID_BZE,
+    TRK8_INSTRUCTION_ID_HLT
+} trk8_opc_args_no_operands_inst_id_t;
 
-typedef enum _TRK8_ARITHMETIC_INSTRUCTION_ID {
-    TRK8_ARITH_INST_ADC = 1,
-    TRK8_ARITH_INST_AND,
-    TRK8_ARITH_INST_OR,
-    TRK8_ARITH_INST_NOT,
-    TRK8_ARITH_INST_CMP
-} trk8_arith_inst_id_t;
+typedef enum _TRK8_OPCODE_ARGUMENTS_ONE_OPERAND_INSTRUCTION_ID {
+    TRK8_INSTRUCTION_ID_STB,
+    TRK8_INSTRUCTION_ID_LDB,
+    TRK8_INSTRUCTION_ID_PUSH,
+    TRK8_INSTRUCTION_ID_POP
+} trk8_opc_args_one_operand_inst_id_t;
 
-typedef enum _TRK8_MEMORY_INSTRUCTION_ID {
-    TRK8_MEMORY_INST_STB = 1,
-    TRK8_MEMORY_INST_LDB,
-    TRK8_MEMORY_INST_JMP,
-    TRK8_MEMORY_INST_BNE,
-    TRK8_MEMORY_INST_BCA,
-    TRK8_MEMORY_INST_BZE
-} trk8_memory_inst_id_t;
+typedef enum _TRK8_OPCODE_ARGUMENTS_TWO_OPERANDS_INSTRUCTION_ID {
+    TRK8_INSTRUCTION_ID_MOV
+} trk8_opc_args_two_operands_inst_id_t;
 
-typedef enum _TRK8_MISC_INSTRUCTION_ID {
-    TRK8_MISC_INST_NOP = 1,
-    TRK8_MISC_INST_HLT
-} trk8_misc_inst_id_t;
+typedef struct _TRK8_OPCODE_ARGUMENTS_NO_OPERANDS {
+    trk8_opc_args_no_operands_inst_id_t instruction_id;
+} trk8_opc_args_no_operands_t;
 
-typedef struct _TRK8_OPCODE {
-    trk8_inst_cat_t category;
+typedef struct _TRK8_OPCODE_ARGUMENTS_ONE_OPERAND {
+    trk8_opc_args_one_operand_inst_id_t instruction_id;
 
-    union _OPCODE_INSTRUCTRION_ID {
-        trk8_data_inst_id_t data_id;
-        trk8_arith_inst_id_t arithmetic_id;
-        trk8_memory_inst_id_t memory_id;
-        trk8_misc_inst_id_t misc_id;
-    } instruction_id;
+    trk8_register_id_t register_id;
+
+    bool has_immediate;
+} trk8_opc_args_one_operand_t;
+
+typedef struct _TRK8_OPCODE_ARGUMENTS_TWO_OPERANDS {
+    trk8_opc_args_two_operands_inst_id_t instruction_id;
+
+    trk8_register_id_t destination_register_id;
 
     bool has_immediate;
 
-    trk8_register_id_t first_register_id;
+    union _TRK8_OPCODE_ARGUMENT_SOURCE {
+        trk8_register_id_t source_register_id;
+
+        uint8_t immediate;
+    } source;
+} trk8_opc_args_two_operands_t;
+
+typedef struct _TRK8_OPCODE {
+    trk8_opc_category_t category;
+
+    union _TRK8_OPCODE_ARGUMENTS {
+        trk8_opc_args_no_operands_t no_operands;
+        trk8_opc_args_one_operand_t one_operand;
+        trk8_opc_args_two_operands_t two_operands;
+    } arguments;
 } trk8_opcode_t;
 
 #endif

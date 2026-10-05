@@ -26,8 +26,4 @@ trk8_machine_state_t machine_state_init(void);
 
 void machine_run(trk8_machine_t* machine);
 
-trk8_opcode_t parse_opcode(uint8_t opcode);
-
-void execute_opcode(trk8_machine_t* machine, trk8_opcode_t opcode);
-
 #endif

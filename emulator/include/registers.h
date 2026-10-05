@@ -36,7 +36,7 @@ typedef struct _TRK8_REGISTERS {
     uint8_t pcl, pch;
 } trk8_registers_t;
 
-typedef enum _TRK8_REGISTER_ID {
+typedef enum __attribute__((packed)) _TRK8_REGISTER_ID {
     TRK8_REGISTER_A,
     TRK8_REGISTER_B,
     TRK8_REGISTER_C,
