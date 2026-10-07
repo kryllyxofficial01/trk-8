@@ -3,45 +3,33 @@
 static inline trk8_opcode_t parse_opcode(uint8_t opcode) {
     trk8_opcode_t instruction_opcode;
 
-    uint8_t category = opcode >> 6;
+    instruction_opcode.category = opcode & TRK8_OPCODE_CATEGORY_MASK;
 
-    switch (category) {
+    switch (instruction_opcode.category) {
         case TRK8_OPCODE_CATEGORY_NO_OPERANDS: {
-            instruction_opcode.category = category;
-
-            instruction_opcode.arguments.no_operands.instruction_id = opcode & 0b00111111;
+            instruction_opcode.instruction_id.no_operands_id = opcode & TRK8_OPCODE_NO_OPERANDS_INSTRUCTION_ID_MASK;
 
             break;
         }
 
         case TRK8_OPCODE_CATEGORY_ONE_OPERAND: {
-            instruction_opcode.category = category;
+            instruction_opcode.instruction_id.one_operand_id = opcode & TRK8_OPCODE_ONE_OPERAND_INSTRUCTION_ID_MASK;
 
-            instruction_opcode.arguments.one_operand.instruction_id = opcode & 0b00110000;
+            uint8_t source_register_id = opcode & TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK;
 
-            uint8_t register_id = opcode & 0b00001111;
+            instruction_opcode.has_immediate_operand = source_register_id == TRK8_OPCODE_ONE_OPERAND_IMMEDIATE_VALUE_SOURCE;
 
-            if (register_id == 0b1111) {
-                instruction_opcode.arguments.one_operand.has_immediate = true;
-
-                // set the register index to one that doesnt match to anything
-                instruction_opcode.arguments.one_operand.register_id = 0b1110;
-            }
-            else {
-                instruction_opcode.arguments.one_operand.register_id = register_id;
-            }
+            instruction_opcode.register_id = instruction_opcode.has_immediate_operand ? 0 : source_register_id;
 
             break;
         }
 
         case TRK8_OPCODE_CATEGORY_TWO_OPERANDS: {
-            instruction_opcode.category = category;
+            instruction_opcode.instruction_id.two_operands_id = opcode & TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK;
 
-            instruction_opcode.arguments.two_operands.instruction_id = opcode & 0b00100000;
+            instruction_opcode.register_id = opcode & TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK;
 
-            instruction_opcode.arguments.two_operands.destination_register_id = opcode & 0b00011110;
-
-            instruction_opcode.arguments.two_operands.has_immediate = opcode & 0b00000001;
+            instruction_opcode.has_immediate_operand = opcode & TRK8_OPCODE_TWO_OPERANDS_HAS_IMMEDIATE_OPERAND_MASK;
 
             break;
         }

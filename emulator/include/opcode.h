@@ -1,15 +1,49 @@
 #ifndef __TRK8_OPCODE_H
 #define __TRK8_OPCODE_H
 
+#include <stdbool.h>
+
 #include "registers.h"
+
+#ifndef TRK8_OPCODE_CATEGORY_MASK
+    #define TRK8_OPCODE_CATEGORY_MASK (0b11000000)
+#endif
+
+#ifndef TRK8_OPCODE_NO_OPERANDS_INSTRUCTION_ID_MASK
+    #define TRK8_OPCODE_NO_OPERANDS_INSTRUCTION_ID_MASK (0b00111111)
+#endif
+
+#ifndef TRK8_OPCODE_ONE_OPERAND_INSTRUCTION_ID_MASK
+    #define TRK8_OPCODE_ONE_OPERAND_INSTRUCTION_ID_MASK (0b00110000)
+#endif
+
+#ifndef TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK
+    #define TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK (0b00100000)
+#endif
+
+#ifndef TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK
+    #define TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK (0b00001111)
+#endif
+
+#ifndef TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK
+    #define TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK (0b00011110)
+#endif
+
+#ifndef TRK8_OPCODE_TWO_OPERANDS_HAS_IMMEDIATE_OPERAND_MASK
+    #define TRK8_OPCODE_TWO_OPERANDS_HAS_IMMEDIATE_OPERAND_MASK (0b00000001)
+#endif
+
+#ifndef TRK8_OPCODE_ONE_OPERAND_IMMEDIATE_VALUE_SOURCE
+    #define TRK8_OPCODE_ONE_OPERAND_IMMEDIATE_VALUE_SOURCE (0b1111)
+#endif
 
 typedef enum _TRK8_OPCODE_CATEGORY {
     TRK8_OPCODE_CATEGORY_NO_OPERANDS,
     TRK8_OPCODE_CATEGORY_ONE_OPERAND,
     TRK8_OPCODE_CATEGORY_TWO_OPERANDS
-} trk8_opc_category_t;
+} trk8_opcode_category_t;
 
-typedef enum _TRK8_OPCODE_ARGUMENTS_NO_OPERANDS_INSTRUCTION_ID {
+enum __attribute__((packed)) _TRK8_INSTRUCTION_ID_NO_OPERANDS {
     TRK8_INSTRUCTION_ID_NOP = 1,
     TRK8_INSTRUCTION_ID_ADC,
     TRK8_INSTRUCTION_ID_AND,
@@ -21,53 +55,31 @@ typedef enum _TRK8_OPCODE_ARGUMENTS_NO_OPERANDS_INSTRUCTION_ID {
     TRK8_INSTRUCTION_ID_BCA,
     TRK8_INSTRUCTION_ID_BZE,
     TRK8_INSTRUCTION_ID_HLT
-} trk8_opc_args_no_operands_inst_id_t;
+};
 
-typedef enum _TRK8_OPCODE_ARGUMENTS_ONE_OPERAND_INSTRUCTION_ID {
+enum __attribute__((packed)) _TRK8_INSTRUCTION_ID_ONE_OPERAND {
     TRK8_INSTRUCTION_ID_STB,
     TRK8_INSTRUCTION_ID_LDB,
     TRK8_INSTRUCTION_ID_PUSH,
     TRK8_INSTRUCTION_ID_POP
-} trk8_opc_args_one_operand_inst_id_t;
+};
 
-typedef enum _TRK8_OPCODE_ARGUMENTS_TWO_OPERANDS_INSTRUCTION_ID {
+enum __attribute__((packed)) _TRK8_INSTRUCTION_ID_TWO_OPERANDS {
     TRK8_INSTRUCTION_ID_MOV
-} trk8_opc_args_two_operands_inst_id_t;
+};
 
-typedef struct _TRK8_OPCODE_ARGUMENTS_NO_OPERANDS {
-    trk8_opc_args_no_operands_inst_id_t instruction_id;
-} trk8_opc_args_no_operands_t;
+typedef struct _TRK8_OPCODE {
+    trk8_opcode_category_t category;
 
-typedef struct _TRK8_OPCODE_ARGUMENTS_ONE_OPERAND {
-    trk8_opc_args_one_operand_inst_id_t instruction_id;
+    union _OPCODE_INSTRUCTION_ID {
+        enum _TRK8_INSTRUCTION_ID_NO_OPERANDS no_operands_id;
+        enum _TRK8_INSTRUCTION_ID_ONE_OPERAND one_operand_id;
+        enum _TRK8_INSTRUCTION_ID_TWO_OPERANDS two_operands_id;
+    } instruction_id;
 
     trk8_register_id_t register_id;
 
-    bool has_immediate;
-} trk8_opc_args_one_operand_t;
-
-typedef struct _TRK8_OPCODE_ARGUMENTS_TWO_OPERANDS {
-    trk8_opc_args_two_operands_inst_id_t instruction_id;
-
-    trk8_register_id_t destination_register_id;
-
-    bool has_immediate;
-
-    union _TRK8_OPCODE_ARGUMENT_SOURCE {
-        trk8_register_id_t source_register_id;
-
-        uint8_t immediate;
-    } source;
-} trk8_opc_args_two_operands_t;
-
-typedef struct _TRK8_OPCODE {
-    trk8_opc_category_t category;
-
-    union _TRK8_OPCODE_ARGUMENTS {
-        trk8_opc_args_no_operands_t no_operands;
-        trk8_opc_args_one_operand_t one_operand;
-        trk8_opc_args_two_operands_t two_operands;
-    } arguments;
+    bool has_immediate_operand;
 } trk8_opcode_t;
 
 #endif
