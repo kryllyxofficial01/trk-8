@@ -1,6 +1,6 @@
 #include "include/machine.h"
 
-static inline trk8_opcode_t parse_opcode(uint8_t opcode) {
+static inline trk8_opcode_t parse_opcode(const uint8_t opcode) {
     trk8_opcode_t instruction_opcode;
 
     instruction_opcode.category = opcode & TRK8_OPCODE_CATEGORY_MASK;
@@ -38,8 +38,38 @@ static inline trk8_opcode_t parse_opcode(uint8_t opcode) {
     return instruction_opcode;
 }
 
-static inline void execute_opcode(trk8_machine_t* machine, trk8_opcode_t opcode) {
+static inline void execute_opcode(trk8_machine_t* machine, const trk8_opcode_t opcode) {
+    switch (opcode.category) {
+        case TRK8_OPCODE_CATEGORY_NO_OPERANDS: {
+            execute_no_operands_opcode(
+                &machine->state.registers,
+                &machine->memory,
+                opcode
+            );
 
+            break;
+        }
+
+        case TRK8_OPCODE_CATEGORY_ONE_OPERAND: {
+            execute_one_operand_opcode(
+                &machine->state.registers,
+                &machine->memory,
+                opcode
+            );
+
+            break;
+        }
+
+        case TRK8_OPCODE_CATEGORY_TWO_OPERANDS: {
+            execute_two_operands_opcode(
+                &machine->state.registers,
+                &machine->memory,
+                opcode
+            );
+
+            break;
+        }
+    }
 }
 
 trk8_machine_t machine_init(void) {
