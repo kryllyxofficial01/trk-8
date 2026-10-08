@@ -3,19 +3,19 @@
 static inline trk8_opcode_t parse_opcode(const uint8_t opcode) {
     trk8_opcode_t instruction_opcode;
 
-    instruction_opcode.category = opcode & TRK8_OPCODE_CATEGORY_MASK;
+    instruction_opcode.category = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_CATEGORY_MASK);
 
     switch (instruction_opcode.category) {
         case TRK8_OPCODE_CATEGORY_NO_OPERANDS: {
-            instruction_opcode.instruction_id.no_operands_id = opcode & TRK8_OPCODE_NO_OPERANDS_INSTRUCTION_ID_MASK;
+            instruction_opcode.instruction_id.no_operands_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_NO_OPERANDS_INSTRUCTION_ID_MASK);
 
             break;
         }
 
         case TRK8_OPCODE_CATEGORY_ONE_OPERAND: {
-            instruction_opcode.instruction_id.one_operand_id = opcode & TRK8_OPCODE_ONE_OPERAND_INSTRUCTION_ID_MASK;
+            instruction_opcode.instruction_id.one_operand_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_ONE_OPERAND_INSTRUCTION_ID_MASK);
 
-            uint8_t source_register_id = opcode & TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK;
+            uint8_t source_register_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK);
 
             instruction_opcode.has_immediate_operand = source_register_id == TRK8_OPCODE_ONE_OPERAND_IMMEDIATE_VALUE_SOURCE;
 
@@ -25,11 +25,11 @@ static inline trk8_opcode_t parse_opcode(const uint8_t opcode) {
         }
 
         case TRK8_OPCODE_CATEGORY_TWO_OPERANDS: {
-            instruction_opcode.instruction_id.two_operands_id = opcode & TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK;
+            instruction_opcode.instruction_id.two_operands_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK);
 
-            instruction_opcode.register_id = opcode & TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK;
+            instruction_opcode.register_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK);;
 
-            instruction_opcode.has_immediate_operand = opcode & TRK8_OPCODE_TWO_OPERANDS_HAS_IMMEDIATE_OPERAND_MASK;
+            instruction_opcode.has_immediate_operand = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_HAS_IMMEDIATE_OPERAND_MASK);
 
             break;
         }

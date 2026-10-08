@@ -71,6 +71,7 @@ TRK8_INSTRUCTIONS_ONE_OPERAND(
 
     trk8_registers_t* registers,
     trk8_memory_t* memory,
+    const trk8_register_id_t register_id,
     const bool has_immediate_operand
 );
 

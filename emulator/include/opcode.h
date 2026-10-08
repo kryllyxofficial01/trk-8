@@ -5,6 +5,10 @@
 
 #include "registers.h"
 
+#ifndef TRK8_OPCODE_EXTRACT_BIT_FIELD
+    #define TRK8_OPCODE_EXTRACT_BIT_FIELD(_opcode, _mask) (((_opcode) & (_mask)) >> __builtin_ctz((_mask)))
+#endif
+
 #ifndef TRK8_OPCODE_CATEGORY_MASK
     #define TRK8_OPCODE_CATEGORY_MASK (0b11000000)
 #endif

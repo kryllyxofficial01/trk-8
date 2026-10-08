@@ -18,15 +18,15 @@ void execute_no_operands_opcode(trk8_registers_t* registers, trk8_memory_t* memo
 
 void execute_one_operand_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
     switch (opcode.instruction_id.one_operand_id) {
-        case TRK8_INSTRUCTION_ID_STB: instruction_stb(registers, memory, opcode.has_immediate_operand); break;
-        case TRK8_INSTRUCTION_ID_LDB: instruction_ldb(registers, memory, opcode.has_immediate_operand); break;
-        case TRK8_INSTRUCTION_ID_PUSH: instruction_push(registers, memory, opcode.has_immediate_operand); break;
-        case TRK8_INSTRUCTION_ID_POP: instruction_pop(registers, memory, opcode.has_immediate_operand); break;
+        case TRK8_INSTRUCTION_ID_STB: instruction_stb(registers, memory, opcode.register_id, opcode.has_immediate_operand); break;
+        case TRK8_INSTRUCTION_ID_LDB: instruction_ldb(registers, memory, opcode.register_id, opcode.has_immediate_operand); break;
+        case TRK8_INSTRUCTION_ID_PUSH: instruction_push(registers, memory, opcode.register_id, opcode.has_immediate_operand); break;
+        case TRK8_INSTRUCTION_ID_POP: instruction_pop(registers, memory, opcode.register_id, opcode.has_immediate_operand); break;
     }
 }
 
 void execute_two_operands_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
-    switch (opcode.instruction_id.one_operand_id) {
+    switch (opcode.instruction_id.two_operands_id) {
         case TRK8_INSTRUCTION_ID_MOV: instruction_mov(registers, memory, opcode.register_id, opcode.has_immediate_operand); break;
     }
 }
@@ -35,24 +35,63 @@ void instruction_nop(trk8_registers_t* registers, trk8_memory_t* memory) {
     __asm__ __volatile__ ("nop");
 }
 
-void instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t destination_register_id, const _Bool has_immediate_operand) {
-    
+void instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t destination_register_id, const bool has_immediate_operand) {
+    registers_increment_pc(registers, 1);
+
+    uint8_t source = memory_read_byte(*memory, registers_get_pc_word(*registers));
+
+    if (has_immediate_operand) {
+        registers_set(registers, destination_register_id, source);
+    }
+    else {
+        registers_set(registers, destination_register_id, registers_get(*registers, source));
+    }
 }
 
-void instruction_stb(trk8_registers_t* registers, trk8_memory_t* memory, const _Bool has_immediate_operand) {
+void instruction_stb(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source;
 
+    if (has_immediate_operand) {
+        registers_increment_pc(registers, 1);
+
+        source = memory_read_byte(*memory, registers_get_pc_word(*registers));
+    }
+    else {
+        source = registers_get(*registers, register_id);
+    }
+
+    memory_write_byte(memory, registers_get_address_word(*registers), source);
 }
 
-void instruction_ldb(trk8_registers_t* registers, trk8_memory_t* memory, const _Bool has_immediate_operand) {
+void instruction_ldb(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source = memory_read_byte(*memory, registers_get_address_word(*registers));
 
+    registers_set(registers, register_id, source);
 }
 
-void instruction_push(trk8_registers_t* registers, trk8_memory_t* memory, const _Bool has_immediate_operand) {
+void instruction_push(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source;
 
+    if (has_immediate_operand) {
+        registers_increment_pc(registers, 1);
+
+        source = memory_read_byte(*memory, registers_get_pc_word(*registers));
+    }
+    else {
+        source = registers_get(*registers, register_id);
+    }
+
+    memory_write_byte(memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP), source);
+
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) - 1);
 }
 
-void instruction_pop(trk8_registers_t* registers, trk8_memory_t* memory, const _Bool has_immediate_operand) {
+void instruction_pop(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source = memory_read_byte(*memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP));
 
+    registers_set(registers, register_id, source);
+
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) + 1);
 }
 
 void instruction_adc(trk8_registers_t* registers, trk8_memory_t* memory) {
