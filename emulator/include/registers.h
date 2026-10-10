@@ -1,90 +1,68 @@
 #ifndef __TRK8_REGISTERS_H
 #define __TRK8_REGISTERS_H
 
+#include <stdint.h>
+
 #include "utils.h"
 
-#ifndef TRK8_NEGATIVE_FLAG_INDEX
-    #define TRK8_NEGATIVE_FLAG_INDEX (0)
+#ifndef TRK8_FLAGS_ZERO_BIT_INDEX
+    #define TRK8_FLAGS_ZERO_BIT_INDEX (2)
 #endif
 
-#ifndef TRK8_CARRY_FLAG_INDEX
-    #define TRK8_CARRY_FLAG_INDEX (1)
+#ifndef TRK8_FLAGS_CARRY_BIT_INDEX
+    #define TRK8_FLAGS_CARRY_BIT_INDEX (1)
 #endif
 
-#ifndef TRK8_ZERO_FLAG_INDEX
-    #define TRK8_ZERO_FLAG_INDEX (2)
+#ifndef TRK8_FLAGS_NEGATIVE_BIT_INDEX
+    #define TRK8_FLAGS_NEGATIVE_BIT_INDEX (0)
 #endif
 
-#ifndef TRK8_NEGATIVE_FLAG_INITIAL_VALUE
-    #define TRK8_NEGATIVE_FLAG_INITIAL_VALUE (0b0)
-#endif
-
-#ifndef TRK8_CARRY_FLAG_INITIAL_VALUE
-    #define TRK8_CARRY_FLAG_INITIAL_VALUE (0b0)
-#endif
-
-#ifndef TRK8_ZERO_FLAG_INITIAL_VALUE
-    #define TRK8_ZERO_FLAG_INITIAL_VALUE (0b0)
-#endif
-
-#ifndef TRK8_NEGATIVE_VALUE_BIT
-    #define TRK8_NEGATIVE_VALUE_BIT (8)
-#endif
-
-// #ifndef TRK8_CARRY_VALUE_BIT
-//     #define TRK8_CARRY_VALUE_BIT (9)
-// #endif
-
-#ifndef TRK8_CARRY_VALUE_THRESHOLD
-    #define TRK8_CARRY_VALUE_THRESHOLD (UINT8_MAX)
-#endif
-
-#ifndef TRK8_STACK_POINTER_INITIAL_VALUE
-    #define TRK8_STACK_POINTER_INITIAL_VALUE (0xff)
-#endif
-
-#ifndef TRK8_ADDRESS_REGISTER_LOW_BYTE_INITIAL_VALUE
-    #define TRK8_ADDRESS_REGISTER_LOW_BYTE_INITIAL_VALUE (0x00)
-#endif
-
-#ifndef TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE
-    #define TRK8_ADDRESS_REGISTER_HIGH_BYTE_INITIAL_VALUE (0x81)
+#ifndef TRK8_NEGATIVE_BIT_INDEX
+    #define TRK8_NEGATIVE_BIT_INDEX (7)
 #endif
 
 typedef struct _TRK8_REGISTERS {
-    struct _REGISTERS_GENERAL_PURPOSE {
-        uint8_t a, b, c, d;
-    } general_purpose;
+    uint8_t a;
+    uint8_t b;
+    uint8_t c;
+    uint8_t x;
 
-    uint8_t stack_pointer;
+    uint8_t sp;
 
-    struct _REGISTERS_ADDRESS {
-        uint8_t low; // al
-        uint8_t high; // ah
-    } address;
+    uint8_t f : 4;
 
-    unsigned int flags : 4;
+    uint8_t al, ah;
+
+    uint8_t pcl, pch;
 } trk8_registers_t;
 
-typedef enum _TRK8_REGISTER_IDS {
-    TRK8_REGISTER_GP_A,
-    TRK8_REGISTER_GP_B,
-    TRK8_REGISTER_GP_C,
-    TRK8_REGISTER_GP_D,
+typedef enum __attribute__((packed)) _TRK8_REGISTER_ID {
+    TRK8_REGISTER_A,
+    TRK8_REGISTER_B,
+    TRK8_REGISTER_C,
+    TRK8_REGISTER_X,
 
     TRK8_REGISTER_SP,
 
-    TRK8_REGISTER_ADDRESS_LOW,
-    TRK8_REGISTER_ADDRESS_HIGH,
+    TRK8_REGISTER_F,
 
-    TRK8_REGISTER_FLAGS
-} register_id_t;
+    TRK8_REGISTER_AL,
+    TRK8_REGISTER_AH,
 
-void registers_init(trk8_registers_t* registers);
+    TRK8_REGISTER_PCL,
+    TRK8_REGISTER_PCH
+} trk8_register_id_t;
 
-uint8_t registers_get(const trk8_registers_t registers, register_id_t register_id);
-void registers_set(trk8_registers_t* registers, register_id_t register_id, uint8_t value);
+trk8_registers_t registers_init(void);
 
-void registers_update_flags(trk8_registers_t* registers, uint16_t value);
+uint8_t registers_get(const trk8_registers_t registers, const trk8_register_id_t register_id);
+void registers_set(trk8_registers_t* registers, const trk8_register_id_t register_id, const uint8_t value);
+
+void registers_update_flags(trk8_registers_t* registers, const uint16_t value);
+
+uint16_t registers_get_address_word(const trk8_registers_t registers);
+uint16_t registers_get_pc_word(const trk8_registers_t registers);
+
+void registers_increment_pc(trk8_registers_t* registers, uint16_t amount);
 
 #endif

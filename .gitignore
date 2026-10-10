@@ -57,3 +57,7 @@ dkms.conf
 
 # Valgrind Core Dumps
 vgcore.*
+
+# TRK8 Bin Files
+*.trk8
+*.bin

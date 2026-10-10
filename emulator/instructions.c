@@ -1,478 +1,220 @@
 #include "include/instructions.h"
 
-void trk8_nop(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
+static inline void load_pc_with_address(trk8_registers_t* registers) {
+    registers_set(registers, TRK8_REGISTER_PCL, registers_get(*registers, TRK8_REGISTER_AL));
+    registers_set(registers, TRK8_REGISTER_PCH, registers_get(*registers, TRK8_REGISTER_AH));
 }
 
-void trk8_mov(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t destination = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t source = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_REG_IMM8: {
-            registers_set(machine->registers, destination, source);
-
-            registers_update_flags(machine->registers, source);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REG_REG: {
-            uint8_t source_data = registers_get(*machine->registers, source);
-
-            registers_set(machine->registers, destination, source_data);
-
-            registers_update_flags(machine->registers, source_data);
-
-            break;
-        }
+bool execute_no_operands_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
+    switch (opcode.instruction_id.no_operands_id) {
+        case TRK8_INSTRUCTION_ID_NOP: return instruction_nop(registers, memory);
+        case TRK8_INSTRUCTION_ID_ADC: return instruction_adc(registers, memory);
+        case TRK8_INSTRUCTION_ID_AND: return instruction_and(registers, memory);
+        case TRK8_INSTRUCTION_ID_OR: return instruction_or(registers, memory);
+        case TRK8_INSTRUCTION_ID_NOT: return instruction_not(registers, memory);
+        case TRK8_INSTRUCTION_ID_CMP: return instruction_cmp(registers, memory);
+        case TRK8_INSTRUCTION_ID_JMP: return instruction_jmp(registers, memory);
+        case TRK8_INSTRUCTION_ID_BNE: return instruction_bne(registers, memory);
+        case TRK8_INSTRUCTION_ID_BCA: return instruction_bca(registers, memory);
+        case TRK8_INSTRUCTION_ID_BZE: return instruction_bze(registers, memory);
+        case TRK8_INSTRUCTION_ID_HLT: return instruction_hlt(registers, memory);
     }
-
-    memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_lda(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    registers_set(
-        machine->registers,
-        TRK8_REGISTER_ADDRESS_LOW,
-        memory_fetch_byte(
-            *machine->memory,
-            memory_get_program_counter(*machine->memory)
-        )
-    );
-
-    memory_increment_program_counter(machine->memory, 1);
-
-    registers_set(
-        machine->registers,
-        TRK8_REGISTER_ADDRESS_HIGH,
-        memory_fetch_byte(
-            *machine->memory,
-            memory_get_program_counter(*machine->memory)
-        )
-    );
-
-    memory_increment_program_counter(machine->memory, 1);
-}
-
-void trk8_stb(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-    uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
-
-    uint16_t address = TRK8_WORD(address_high, address_low);
-
-    uint8_t source = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_IMM8: {
-            memory_write_byte(machine->memory, address, source);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REGISTER: {
-            uint8_t source_data = registers_get(*machine->registers, source);
-
-            memory_write_byte(machine->memory, address, source_data);
-
-            break;
-        }
+bool execute_one_operand_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
+    switch (opcode.instruction_id.one_operand_id) {
+        case TRK8_INSTRUCTION_ID_STB: return instruction_stb(registers, memory, opcode.register_id, opcode.has_immediate_operand);
+        case TRK8_INSTRUCTION_ID_LDB: return instruction_ldb(registers, memory, opcode.register_id, opcode.has_immediate_operand);
+        case TRK8_INSTRUCTION_ID_PUSH: return instruction_push(registers, memory, opcode.register_id, opcode.has_immediate_operand);
+        case TRK8_INSTRUCTION_ID_POP: return instruction_pop(registers, memory, opcode.register_id, opcode.has_immediate_operand);
     }
-
-    memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_ldb(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t register_id = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
-    uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-    uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
-
-    uint16_t address = TRK8_WORD(address_high, address_low);
-
-    uint8_t source = memory_fetch_byte(*machine->memory, address);
-
-    registers_set(machine->registers, register_id, source);
-
-    registers_update_flags(machine->registers, source);
-
-    memory_increment_program_counter(machine->memory, 1);
-}
-
-void trk8_push(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
-    uint16_t stack_address = TRK8_STACK_START + stack_pointer;
-
-    uint8_t source = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_IMM8: {
-            memory_write_byte(machine->memory, stack_address, source);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REGISTER: {
-            uint8_t source_data = registers_get(*machine->registers, source);
-
-            memory_write_byte(machine->memory, stack_address, source_data);
-
-            break;
-        }
+bool execute_two_operands_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
+    switch (opcode.instruction_id.two_operands_id) {
+        case TRK8_INSTRUCTION_ID_MOV: return instruction_mov(registers, memory, opcode.register_id, opcode.has_immediate_operand);
     }
-
-    registers_set(machine->registers, TRK8_REGISTER_SP, stack_pointer - 1);
-
-    memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_pop(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t register_id = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-
-    uint8_t stack_pointer = registers_get(*machine->registers, TRK8_REGISTER_SP);
-    uint16_t stack_address = TRK8_STACK_START + stack_pointer;
-
-    uint8_t source = memory_fetch_byte(*machine->memory, stack_address);
-
-    registers_set(machine->registers, register_id, source);
-
-    registers_update_flags(machine->registers, source);
-
-    registers_set(machine->registers, TRK8_REGISTER_SP, stack_pointer + 1);
-
-    memory_increment_program_counter(machine->memory, 1);
-}
-
-void trk8_adc(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_REG_IMM8: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_value = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t flags = registers_get(*machine->registers, TRK8_REGISTER_FLAGS);
-
-            uint16_t sum = left_operand_value + right_operand_value + TRK8_BIT_CHECK(flags, TRK8_CARRY_FLAG_INDEX);
-
-            registers_set(machine->registers, left_operand_id, sum);
-
-            registers_update_flags(machine->registers, sum);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REG_REG: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t right_operand_value = registers_get(*machine->registers, right_operand_id);
-
-            uint8_t flags = registers_get(*machine->registers, TRK8_REGISTER_FLAGS);
-
-            uint16_t sum = left_operand_value + right_operand_value + TRK8_BIT_CHECK(flags, TRK8_CARRY_FLAG_INDEX);
-
-            registers_set(machine->registers, left_operand_id, sum);
-
-            registers_update_flags(machine->registers, sum);
-
-            break;
-        }
+bool execute_has_16bit_operand_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
+    switch (opcode.instruction_id.has_16bit_operand_id) {
+        case TRK8_INSTRUCTION_ID_LDA: return instruction_lda(registers, memory);
     }
-
-    memory_increment_program_counter(machine->memory, 1);
 }
 
-void trk8_and(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
+bool instruction_nop(trk8_registers_t* registers, trk8_memory_t* memory) {
+    __asm__ __volatile__ ("nop");
 
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_REG_IMM8: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_value = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint16_t result = left_operand_value & right_operand_value;
-
-            registers_set(machine->registers, left_operand_id, result);
-
-            registers_update_flags(machine->registers, result);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REG_REG: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t right_operand_value = registers_get(*machine->registers, right_operand_id);
-
-            uint16_t result = left_operand_value & right_operand_value;
-
-            registers_set(machine->registers, left_operand_id, result);
-
-            registers_update_flags(machine->registers, result);
-
-            break;
-        }
-    }
-
-    memory_increment_program_counter(machine->memory, 1);
+    return true;
 }
 
-void trk8_or(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
+bool instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t destination_register_id, const bool has_immediate_operand) {
+    registers_increment_pc(registers, 1);
 
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_REG_IMM8: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
+    uint8_t source = memory_read_byte(*memory, registers_get_pc_word(*registers));
 
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_value = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint16_t result = left_operand_value | right_operand_value;
-
-            registers_set(machine->registers, left_operand_id, result);
-
-            registers_update_flags(machine->registers, result);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REG_REG: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t right_operand_value = registers_get(*machine->registers, right_operand_id);
-
-            uint16_t result = left_operand_value | right_operand_value;
-
-            registers_set(machine->registers, left_operand_id, result);
-
-            registers_update_flags(machine->registers, result);
-
-            break;
-        }
-    }
-
-    memory_increment_program_counter(machine->memory, 1);
-}
-
-void trk8_not(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    uint8_t register_id = memory_fetch_byte(
-        *machine->memory,
-        memory_get_program_counter(*machine->memory)
-    );
-    uint8_t value = registers_get(*machine->registers, register_id);
-
-    uint8_t result = ~value;
-
-    registers_set(machine->registers, register_id, result);
-
-    registers_update_flags(machine->registers, result);
-
-    memory_increment_program_counter(machine->memory, 1);
-}
-
-void trk8_cmp(trk8_machine_t* machine, const uint8_t operands_type) {
-    memory_increment_program_counter(machine->memory, 1);
-
-    switch (operands_type) {
-        case TRK8_OPERANDS_TYPE_REG_IMM8: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_value = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            registers_update_flags(machine->registers, left_operand_value - right_operand_value);
-
-            break;
-        }
-
-        case TRK8_OPERANDS_TYPE_REG_REG: {
-            uint8_t left_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t left_operand_value = registers_get(*machine->registers, left_operand_id);
-
-            memory_increment_program_counter(machine->memory, 1);
-
-            uint8_t right_operand_id = memory_fetch_byte(
-                *machine->memory,
-                memory_get_program_counter(*machine->memory)
-            );
-
-            uint8_t right_operand_value = registers_get(*machine->registers, right_operand_id);
-
-            registers_update_flags(machine->registers, left_operand_value - right_operand_value);
-
-            break;
-        }
-    }
-
-    memory_increment_program_counter(machine->memory, 1);
-}
-
-void trk8_jmp(trk8_machine_t* machine, const uint8_t operands_type) {
-    uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-    uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
-
-    uint16_t address = TRK8_WORD(address_high, address_low);
-
-    memory_set_program_counter(machine->memory, address);
-}
-
-void trk8_jn(trk8_machine_t* machine, const uint8_t operands_type) {
-    if (TRK8_BIT_CHECK(machine->registers->flags, TRK8_NEGATIVE_FLAG_INDEX)) {
-        uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-        uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
-
-        uint16_t address = TRK8_WORD(address_high, address_low);
-
-        memory_set_program_counter(machine->memory, address);
+    if (has_immediate_operand) {
+        registers_set(registers, destination_register_id, source);
     }
     else {
-        memory_increment_program_counter(machine->memory, 1);
+        registers_set(registers, destination_register_id, registers_get(*registers, source));
     }
+
+    return true;
 }
 
-void trk8_jc(trk8_machine_t* machine, const uint8_t operands_type) {
-    if (TRK8_BIT_CHECK(machine->registers->flags, TRK8_CARRY_FLAG_INDEX)) {
-        uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-        uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
+bool instruction_lda(trk8_registers_t* registers, trk8_memory_t* memory) {
+    registers_increment_pc(registers, 1);
 
-        uint16_t address = TRK8_WORD(address_high, address_low);
+    registers_set(registers, TRK8_REGISTER_AL, memory_read_byte(*memory, registers_get_pc_word(*registers)));
 
-        memory_set_program_counter(machine->memory, address);
+    registers_increment_pc(registers, 1);
+
+    registers_set(registers, TRK8_REGISTER_AH, memory_read_byte(*memory, registers_get_pc_word(*registers)));
+
+    return true;
+}
+
+bool instruction_stb(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source;
+
+    if (has_immediate_operand) {
+        registers_increment_pc(registers, 1);
+
+        source = memory_read_byte(*memory, registers_get_pc_word(*registers));
     }
     else {
-        memory_increment_program_counter(machine->memory, 1);
+        source = registers_get(*registers, register_id);
     }
+
+    memory_write_byte(memory, registers_get_address_word(*registers), source);
+
+    return true;
 }
 
-void trk8_jz(trk8_machine_t* machine, const uint8_t operands_type) {
-    if (TRK8_BIT_CHECK(machine->registers->flags, TRK8_ZERO_FLAG_INDEX)) {
-        uint8_t address_low = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_LOW);
-        uint8_t address_high = registers_get(*machine->registers, TRK8_REGISTER_ADDRESS_HIGH);
+bool instruction_ldb(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source = memory_read_byte(*memory, registers_get_address_word(*registers));
 
-        uint16_t address = TRK8_WORD(address_high, address_low);
+    registers_set(registers, register_id, source);
 
-        memory_set_program_counter(machine->memory, address);
+    return true;
+}
+
+bool instruction_push(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    uint8_t source;
+
+    if (has_immediate_operand) {
+        registers_increment_pc(registers, 1);
+
+        source = memory_read_byte(*memory, registers_get_pc_word(*registers));
     }
     else {
-        memory_increment_program_counter(machine->memory, 1);
+        source = registers_get(*registers, register_id);
     }
+
+    memory_write_byte(memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP), source);
+
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) - 1);
+
+    return true;
 }
 
-void trk8_hlt(trk8_machine_t* machine, const uint8_t operands_type) {
-    machine->state = TRK8_STATE_HALTED;
+bool instruction_pop(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) + 1);
+
+    uint8_t source = memory_read_byte(*memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP));
+
+    registers_set(registers, register_id, source);
+
+    return true;
+}
+
+bool instruction_adc(trk8_registers_t* registers, trk8_memory_t* memory) {
+    uint16_t result = registers_get(*registers, TRK8_REGISTER_A) + registers_get(*registers, TRK8_REGISTER_B);
+
+    registers_update_flags(registers, result);
+
+    registers_set(registers, TRK8_REGISTER_X, TRK8_GET_LOW_BYTE(result));
+
+    return true;
+}
+
+bool instruction_and(trk8_registers_t* registers, trk8_memory_t* memory) {
+    uint16_t result = registers_get(*registers, TRK8_REGISTER_A) & registers_get(*registers, TRK8_REGISTER_B);
+
+    registers_update_flags(registers, result);
+
+    registers_set(registers, TRK8_REGISTER_X, TRK8_GET_LOW_BYTE(result));
+
+    return true;
+}
+
+bool instruction_or(trk8_registers_t* registers, trk8_memory_t* memory) {
+    uint16_t result = registers_get(*registers, TRK8_REGISTER_A) | registers_get(*registers, TRK8_REGISTER_B);
+
+    registers_update_flags(registers, result);
+
+    registers_set(registers, TRK8_REGISTER_X, TRK8_GET_LOW_BYTE(result));
+
+    return true;
+}
+
+bool instruction_not(trk8_registers_t* registers, trk8_memory_t* memory) {
+    uint16_t result = ~registers_get(*registers, TRK8_REGISTER_A);
+
+    registers_update_flags(registers, result);
+
+    registers_set(registers, TRK8_REGISTER_X, TRK8_GET_LOW_BYTE(result));
+
+    return true;
+}
+
+bool instruction_cmp(trk8_registers_t* registers, trk8_memory_t* memory) {
+    uint16_t result = registers_get(*registers, TRK8_REGISTER_A) - registers_get(*registers, TRK8_REGISTER_B);
+
+    registers_update_flags(registers, result);
+
+    return true;
+}
+
+bool instruction_jmp(trk8_registers_t* registers, trk8_memory_t* memory) {
+    load_pc_with_address(registers);
+
+    registers_increment_pc(registers, -1);
+
+    return true;
+}
+
+bool instruction_bne(trk8_registers_t* registers, trk8_memory_t* memory) {
+    if (TRK8_BIT_GET(registers_get(*registers, TRK8_REGISTER_F), TRK8_FLAGS_NEGATIVE_BIT_INDEX)) {
+        load_pc_with_address(registers);
+
+        registers_increment_pc(registers, -1);
+    }
+
+    return true;
+}
+
+bool instruction_bca(trk8_registers_t* registers, trk8_memory_t* memory) {
+    if (TRK8_BIT_GET(registers_get(*registers, TRK8_REGISTER_F), TRK8_FLAGS_CARRY_BIT_INDEX)) {
+        load_pc_with_address(registers);
+
+        registers_increment_pc(registers, -1);
+    }
+
+    return true;
+}
+
+bool instruction_bze(trk8_registers_t* registers, trk8_memory_t* memory) {
+    if (TRK8_BIT_GET(registers_get(*registers, TRK8_REGISTER_F), TRK8_FLAGS_ZERO_BIT_INDEX)) {
+        load_pc_with_address(registers);
+
+        registers_increment_pc(registers, -1);
+    }
+
+    return true;
+}
+
+bool instruction_hlt(trk8_registers_t* registers, trk8_memory_t* memory) {
+    return false;
 }

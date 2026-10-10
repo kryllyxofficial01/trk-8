@@ -1,65 +1,100 @@
 #ifndef __TRK8_INSTRUCTIONS_H
 #define __TRK8_INSTRUCTIONS_H
 
-#include "trk8.h"
-#include "utils.h"
+#include <stdint.h>
+#include <stdbool.h>
 
-#ifndef TRK8_DECLARE_INSTRUCTION
-    #define TRK8_DECLARE_INSTRUCTION(_instruction) \
-        void trk8_##_instruction(trk8_machine_t* machine, const uint8_t operands_type)
+#include "registers.h"
+#include "memory.h"
+#include "opcode.h"
+
+#ifndef TRK8_EXECUTE_OPCODE_CATEGORY_DECL
+    #define TRK8_EXECUTE_OPCODE_CATEGORY_DECL(_category, ...) bool execute_##_category##_opcode(__VA_ARGS__)
 #endif
 
-#ifndef TRK8_INSTRUCTIONS
-    #define TRK8_INSTRUCTIONS(_decl) \
-        _decl(nop); \
-        _decl(mov); \
-        _decl(lda); \
-        _decl(stb); \
-        _decl(ldb); \
-        _decl(push); \
-        _decl(pop); \
-        _decl(adc); \
-        _decl(and); \
-        _decl(or); \
-        _decl(not); \
-        _decl(cmp); \
-        _decl(jmp); \
-        _decl(jn); \
-        _decl(jc); \
-        _decl(jz); \
-        _decl(hlt);
+#ifndef TRK8_INSTRUCTION_DECL
+    #define TRK8_INSTRUCTION_DECL(_mnemonic, ...) bool instruction_##_mnemonic(__VA_ARGS__)
 #endif
 
-enum _TRK8_INSTRUCTION_INDEXES {
-    TRK8_INSTRUCTION_NOP = 1, // tell C to start counting at 1 (because yes)
-    TRK8_INSTRUCTION_MOV,
-    TRK8_INSTRUCTION_LDA,
-    TRK8_INSTRUCTION_STB,
-    TRK8_INSTRUCTION_LDB,
-    TRK8_INSTRUCTION_PUSH,
-    TRK8_INSTRUCTION_POP,
-    TRK8_INSTRUCTION_ADC,
-    TRK8_INSTRUCTION_AND,
-    TRK8_INSTRUCTION_OR,
-    TRK8_INSTRUCTION_NOT,
-    TRK8_INSTRUCTION_CMP,
-    TRK8_INSTRUCTION_JMP,
-    TRK8_INSTRUCTION_JN,
-    TRK8_INSTRUCTION_JC,
-    TRK8_INSTRUCTION_JZ,
-    TRK8_INSTRUCTION_HLT
-};
+#ifndef TRK8_EXECUTE_OPCODE_CATEGORIES
+    #define TRK8_EXECUTE_OPCODE_CATEGORIES(_decl, ...) \
+        _decl(no_operands, __VA_ARGS__); \
+        _decl(one_operand, __VA_ARGS__); \
+        _decl(two_operands, __VA_ARGS__); \
+        _decl(has_16bit_operand, __VA_ARGS__)
+#endif
 
-enum _TRK8_OPERANDS_TYPES {
-    TRK8_OPERANDS_TYPE_NONE,
-    TRK8_OPERANDS_TYPE_IMM8,
-    TRK8_OPERANDS_TYPE_IMM16,
-    TRK8_OPERANDS_TYPE_REGISTER,
-    TRK8_OPERANDS_TYPE_REG_IMM8,
-    TRK8_OPERANDS_TYPE_REG_IMM16,
-    TRK8_OPERANDS_TYPE_REG_REG
-};
+#ifndef TRK8_INSTRUCTIONS_NO_OPERANDS
+    #define TRK8_INSTRUCTIONS_NO_OPERANDS(_decl, ...) \
+        _decl(nop, __VA_ARGS__); \
+        _decl(adc, __VA_ARGS__); \
+        _decl(and, __VA_ARGS__); \
+        _decl(or, __VA_ARGS__); \
+        _decl(not, __VA_ARGS__); \
+        _decl(cmp, __VA_ARGS__); \
+        _decl(jmp, __VA_ARGS__); \
+        _decl(bne, __VA_ARGS__); \
+        _decl(bca, __VA_ARGS__); \
+        _decl(bze, __VA_ARGS__); \
+        _decl(hlt, __VA_ARGS__)
+#endif
 
-TRK8_INSTRUCTIONS(TRK8_DECLARE_INSTRUCTION)
+#ifndef TRK8_INSTRUCTIONS_ONE_OPERAND
+    #define TRK8_INSTRUCTIONS_ONE_OPERAND(_decl, ...) \
+        _decl(stb, __VA_ARGS__); \
+        _decl(ldb, __VA_ARGS__); \
+        _decl(push, __VA_ARGS__); \
+        _decl(pop, __VA_ARGS__)
+#endif
+
+#ifndef TRK8_INSTRUCTIONS_TWO_OPERANDS
+    #define TRK8_INSTRUCTIONS_TWO_OPERANDS(_decl, ...) \
+        _decl(mov, __VA_ARGS__)
+#endif
+
+#ifndef TRK8_INSTRUCTIONS_HAS_16BIT_OPERAND
+    #define TRK8_INSTRUCTIONS_HAS_16BIT_OPERAND(_decl, ...) \
+        _decl(lda, __VA_ARGS__)
+#endif
+
+TRK8_EXECUTE_OPCODE_CATEGORIES(
+    TRK8_EXECUTE_OPCODE_CATEGORY_DECL,
+
+    trk8_registers_t* registers,
+    trk8_memory_t* memory,
+    const trk8_opcode_t opcode
+);
+
+TRK8_INSTRUCTIONS_NO_OPERANDS(
+    TRK8_INSTRUCTION_DECL,
+
+    trk8_registers_t* registers,
+    trk8_memory_t* memory
+);
+
+TRK8_INSTRUCTIONS_ONE_OPERAND(
+    TRK8_INSTRUCTION_DECL,
+
+    trk8_registers_t* registers,
+    trk8_memory_t* memory,
+    const trk8_register_id_t register_id,
+    const bool has_immediate_operand
+);
+
+TRK8_INSTRUCTIONS_TWO_OPERANDS(
+    TRK8_INSTRUCTION_DECL,
+
+    trk8_registers_t* registers,
+    trk8_memory_t* memory,
+    const trk8_register_id_t destination_register_id,
+    const bool has_immediate_operand
+);
+
+TRK8_INSTRUCTIONS_HAS_16BIT_OPERAND(
+    TRK8_INSTRUCTION_DECL,
+
+    trk8_registers_t* registers,
+    trk8_memory_t* memory
+);
 
 #endif

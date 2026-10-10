@@ -1,92 +1,57 @@
 #include "include/memory.h"
 
-void memory_init(trk8_memory_t* memory) {
-    for (uint16_t i = 0; i < TRK8_PROGRAM_MEMORY_LENGTH; i++) {
-        memory->program_memory[i] = 0x0;
+trk8_memory_t memory_init(void) {
+    trk8_memory_t memory;
+
+    for (uint16_t i = TRK8_PROGRAM_MEMORY_START; i <= TRK8_PROGRAM_MEMORY_END; i++) {
+        memory_write_byte(&memory, i, 0x00);
     }
 
-    for (uint16_t i = 0; i < TRK8_STACK_LENGTH; i++) {
-        memory->stack[i] = 0x0;
+    for (uint16_t i = TRK8_STACK_START; i <= TRK8_STACK_END; i++) {
+        memory_write_byte(&memory, i, 0x00);
     }
 
-    for (uint16_t i = 0; i < TRK8_GENERAL_PURPOSE_MEMORY_LENGTH; i++) {
-        memory->general_purpose[i] = 0x0;
+    for (uint32_t i = TRK8_GENERAL_PURPOSE_START; i <= TRK8_GENERAL_PURPOSE_END; i++) {
+        memory_write_byte(&memory, i, 0x00);
     }
 
-    memory->program_counter[0] = TRK8_GET_LOW_BYTE(TRK8_PROGRAM_MEMORY_START);
-    memory->program_counter[1] = TRK8_GET_HIGH_BYTE(TRK8_PROGRAM_MEMORY_START);
+    return memory;
 }
 
-void memory_write_program(trk8_memory_t* total_memory, uint8_t* program, const uint16_t program_length) {
-    if (program_length > TRK8_PROGRAM_MEMORY_LENGTH) {
-        // TODO: handle oversized program memory
-        return;
-    }
-
-    for (uint16_t i = 0; i < TRK8_PROGRAM_MEMORY_LENGTH; i++) {
-        total_memory->program_memory[i] = (i < program_length) ? program[i] : 0x0;
-    }
-
-    if (program_length <= TRK8_PROGRAM_MEMORY_LENGTH - 1) {
-        total_memory->program_memory[program_length] = TRK8_PROGRAM_MEMORY_EOP_BYTE;
+void memory_load_program(trk8_memory_t* memory, const uint8_t* program, const uint16_t program_length) {
+    for (uint16_t i = 0; i < program_length; i++) {
+        memory_write_byte(memory, TRK8_PROGRAM_MEMORY_START + i, program[i]);
     }
 }
 
-uint8_t memory_fetch_byte(const trk8_memory_t memory, const uint16_t address) {
+uint8_t memory_read_byte(const trk8_memory_t memory, const uint16_t address) {
     if (address >= TRK8_PROGRAM_MEMORY_START && address <= TRK8_PROGRAM_MEMORY_END) {
         return memory.program_memory[address - TRK8_PROGRAM_MEMORY_START];
     }
     else if (address >= TRK8_STACK_START && address <= TRK8_STACK_END) {
         return memory.stack[address - TRK8_STACK_START];
     }
-    else if (address >= TRK8_GENERAL_PURPOSE_MEMORY_START && address <= TRK8_GENERAL_PURPOSE_MEMORY_END) {
-        return memory.general_purpose[address - TRK8_GENERAL_PURPOSE_MEMORY_START];
+    else if (address >= TRK8_GENERAL_PURPOSE_START && address <= TRK8_GENERAL_PURPOSE_END) {
+        return memory.general_purpose[address - TRK8_GENERAL_PURPOSE_START];
     }
-    else if (address >= TRK8_PROGRAM_COUNTER_START && address <= TRK8_PROGRAM_COUNTER_END) {
-        return memory.program_counter[TRK8_PROGRAM_COUNTER_START - address];
-    }
-    else {
-        // TODO: handle out of range memory address
-    }
+
+    return 0x00;
 }
 
-void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint8_t data) {
+void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint8_t byte) {
     if (address >= TRK8_PROGRAM_MEMORY_START && address <= TRK8_PROGRAM_MEMORY_END) {
-        memory->program_memory[address - TRK8_PROGRAM_MEMORY_START] = data;
+        memory->program_memory[address - TRK8_PROGRAM_MEMORY_START] = byte;
     }
     else if (address >= TRK8_STACK_START && address <= TRK8_STACK_END) {
-        memory->stack[address - TRK8_STACK_START] = data;
+        memory->stack[address - TRK8_STACK_START] = byte;
     }
-    else if (address >= TRK8_GENERAL_PURPOSE_MEMORY_START && address <= TRK8_GENERAL_PURPOSE_MEMORY_END) {
-        memory->general_purpose[address - TRK8_GENERAL_PURPOSE_MEMORY_START] = data;
-    }
-    else if (address >= TRK8_PROGRAM_COUNTER_START && address <= TRK8_PROGRAM_COUNTER_END) {
-        memory->stack[address - TRK8_PROGRAM_COUNTER_START] = data;
-    }
-    else {
-        // TODO: handle out of range memory address
+    else if (address >= TRK8_GENERAL_PURPOSE_START && address <= TRK8_GENERAL_PURPOSE_END) {
+        memory->general_purpose[address - TRK8_GENERAL_PURPOSE_START] = byte;
     }
 }
 
-void memory_set_program_counter(trk8_memory_t* memory, const uint16_t address) {
-    memory->program_counter[0] = TRK8_GET_LOW_BYTE(address);
-    memory->program_counter[1] = TRK8_GET_HIGH_BYTE(address);
-}
-
-void memory_increment_program_counter(trk8_memory_t* memory, const uint8_t amount) {
-    uint16_t new_pc_value = TRK8_WORD(
-        memory->program_counter[1],
-        memory->program_counter[0]
-    );
-
-    new_pc_value += amount;
-
-    memory_set_program_counter(memory, new_pc_value);
-}
-
-uint16_t memory_get_program_counter(const trk8_memory_t memory) {
-    return TRK8_WORD(
-        memory.program_counter[1],
-        memory.program_counter[0]
-    );
+void memory_dump(const trk8_memory_t memory, const uint16_t start_address, const uint16_t end_address) {
+    for (uint16_t i = start_address; i <= end_address; i++) {
+        printf("[0x%02x]= 0x%02x\n", i, memory_read_byte(memory, i));
+    }
 }
