@@ -9,11 +9,11 @@
 #include "opcode.h"
 
 #ifndef TRK8_EXECUTE_OPCODE_CATEGORY_DECL
-    #define TRK8_EXECUTE_OPCODE_CATEGORY_DECL(_category, ...) void execute_##_category##_opcode(__VA_ARGS__)
+    #define TRK8_EXECUTE_OPCODE_CATEGORY_DECL(_category, ...) bool execute_##_category##_opcode(__VA_ARGS__)
 #endif
 
 #ifndef TRK8_INSTRUCTION_DECL
-    #define TRK8_INSTRUCTION_DECL(_mnemonic, ...) void instruction_##_mnemonic(__VA_ARGS__)
+    #define TRK8_INSTRUCTION_DECL(_mnemonic, ...) bool instruction_##_mnemonic(__VA_ARGS__)
 #endif
 
 #ifndef TRK8_EXECUTE_OPCODE_CATEGORIES

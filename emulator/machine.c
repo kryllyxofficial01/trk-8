@@ -46,46 +46,38 @@ static inline trk8_opcode_t parse_opcode(const uint8_t opcode) {
     return instruction_opcode;
 }
 
-static inline void execute_opcode(trk8_machine_t* machine, const trk8_opcode_t opcode) {
+static inline bool execute_opcode(trk8_machine_t* machine, const trk8_opcode_t opcode) {
     switch (opcode.category) {
         case TRK8_OPCODE_CATEGORY_NO_OPERANDS: {
-            execute_no_operands_opcode(
+            return execute_no_operands_opcode(
                 &machine->state.registers,
                 &machine->memory,
                 opcode
             );
-
-            break;
         }
 
         case TRK8_OPCODE_CATEGORY_ONE_OPERAND: {
-            execute_one_operand_opcode(
+            return execute_one_operand_opcode(
                 &machine->state.registers,
                 &machine->memory,
                 opcode
             );
-
-            break;
         }
 
         case TRK8_OPCODE_CATEGORY_TWO_OPERANDS: {
-            execute_two_operands_opcode(
+            return execute_two_operands_opcode(
                 &machine->state.registers,
                 &machine->memory,
                 opcode
             );
-
-            break;
         }
 
         case TRK8_OPCODE_CATEGORY_HAS_16BIT_OPERAND: {
-            execute_has_16bit_operand_opcode(
+            return execute_has_16bit_operand_opcode(
                 &machine->state.registers,
                 &machine->memory,
                 opcode
             );
-
-            break;
         }
     }
 }
@@ -139,7 +131,7 @@ void machine_run(trk8_machine_t* machine) {
 
         trk8_opcode_t instruction_opcode = parse_opcode(opcode);
 
-        execute_opcode(machine, instruction_opcode);
+        machine->state.halted = !execute_opcode(machine, instruction_opcode);
 
         registers_increment_pc(&machine->state.registers, 1);
     }
