@@ -1,4 +1,3 @@
-============================= Instruction Set =============================
 nop         : No OPeration
 mov r, r/i8 : MOVe [ r = r/i8 ]
 lda i16     : LoaD Address [ al,ah = i16 ]
@@ -20,7 +19,6 @@ hlt         : HaLT
 *    Updates flags
 **   Result is discarded; flags are still updated
 
-============================ Instruction Format ============================
 
 Opcode global bit mapping: CCAAAAAA
     CC = 2 bits indicating which category the instruction belongs to
@@ -111,7 +109,68 @@ HAS 16-BIT OPERAND
 * special value indicating that the byte following the opcode is
   an 8-bit immediate
 
-================================ Registers ================================
+nop         : No OPeration
+mov r, r/i8 : MOVe [ r = r/i8 ]
+xsp         : eXchange Stack Pointer [ a = sp, sp = a ]
+xcf         : eXChange Flags*** [ a = f, f = a ]
+xca 0/1     : eXChange Address byte**** [ a = al/ah, al/ah = a ]
+lda         : Load Address [ ah,al = b,a ]
+stb r/i8    : Store Byte [ r/i8 -> ah,al ]
+ldb r       : Load Byte [ ah,al -> r ]
+push r/i8   : Push to stack [ sp-- = r/i8 ]
+pop r       : Pop from stack [ r = ++sp ]
+adc         : Add with carry* [ x = a + b + f.carry]
+and         : Bitwise AND* [ x = a & b]
+or          : Bitwise OR* [ x = a | b ]
+not         : Bitwise NOT* [ x = ~a]
+cmp         : Compare** [ f = a - b]
+jmp         : Unconditional Jump [ pch,pcl = ah,al ]
+bne         : Branch if Negative [ pch,pcl = ah,al if f.negative]
+bca         : Branch if Carry [ pch,pcl = ah,al if f.carry ]
+bze         : Branch if Zero [ pch,pcl = ah,al if f.zero ]
+hlt         : Halt
+
+*    Updates flags
+**   Result is discarded; flags are still updated
+***  Bottom nibble is used
+**** 0 = al, 1 = ah
+
+
+Opcode Bits: CCIIIMRR
+    CC  = 2-bit index for DATA, ARITHMETIC, MEMORY, or MISC category
+    III = 3-bit instruction ID (see below)
+    M   = 1-bit switch stating if the instruction has an immediate operand
+    RR  = 2-bit index of the first specified register
+
+Categories:
+    DATA (CC = 0b00):
+        mov  -> III = 0b001
+        xsp  -> III = 0b010
+        xcf  -> III = 0b011
+        xca  -> III = 0b100
+        push -> III = 0b101
+        pop  -> III = 0b110
+
+    ARITHMETIC (CC = 0b01):
+        adc -> III = 0b001
+        and -> III = 0b010
+        or  -> III = 0b011
+        not -> III = 0b100
+        cmp -> III = 0b101
+
+    MEMORY (CC = 0b10):
+        lda -> III = 0b001
+        stb -> III = 0b010
+        ldb -> III = 0b011
+        jmp -> III = 0b100
+        bne -> III = 0b101
+        bca -> III = 0b110
+        bze -> III = 0b111
+
+    MISC (CC = 0b11):
+        nop -> III = 0b001
+        hlt -> III = 0b010
+
 General Purpose (8-bit): a, b, c, x
     - "a" and "b" are always used for ALU operands
     - "x" always stores the result of ALU operations
