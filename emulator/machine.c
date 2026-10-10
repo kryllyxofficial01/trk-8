@@ -136,3 +136,26 @@ void machine_run(trk8_machine_t* machine) {
         registers_increment_pc(&machine->state.registers, 1);
     }
 }
+
+void machine_print_state(const trk8_machine_state_t state) {
+    printf("========== Registers ==========\n");
+
+    printf(
+        "a=%u, b=%u, c=%u, x=%u\nsp=%u, f=%u\nal=0x%02x, ah=0x%02x\npcl=0x%02x, pch=0x%02x\n",
+        registers_get(state.registers, TRK8_REGISTER_A),
+        registers_get(state.registers, TRK8_REGISTER_B),
+        registers_get(state.registers, TRK8_REGISTER_C),
+        registers_get(state.registers, TRK8_REGISTER_X),
+
+        registers_get(state.registers, TRK8_REGISTER_SP),
+        registers_get(state.registers, TRK8_REGISTER_F),
+
+        registers_get(state.registers, TRK8_REGISTER_AL),
+        registers_get(state.registers, TRK8_REGISTER_AH),
+
+        registers_get(state.registers, TRK8_REGISTER_PCL),
+        registers_get(state.registers, TRK8_REGISTER_PCH)
+    );
+
+    printf("===============================\n");
+}

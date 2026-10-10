@@ -1,6 +1,7 @@
 #ifndef __TRK8_MACHINE_STATE_H
 #define __TRK8_MACHINE_STATE_H
 
+#include <stdio.h>
 #include <stdbool.h>
 
 #include "registers.h"
@@ -25,5 +26,7 @@ trk8_machine_t machine_init(void);
 trk8_machine_state_t machine_state_init(void);
 
 void machine_run(trk8_machine_t* machine);
+
+void machine_print_state(const trk8_machine_state_t state);
 
 #endif

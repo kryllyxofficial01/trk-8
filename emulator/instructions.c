@@ -120,11 +120,11 @@ bool instruction_push(trk8_registers_t* registers, trk8_memory_t* memory, const 
 }
 
 bool instruction_pop(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {
+    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) + 1);
+
     uint8_t source = memory_read_byte(*memory, TRK8_STACK_START + registers_get(*registers, TRK8_REGISTER_SP));
 
     registers_set(registers, register_id, source);
-
-    registers_set(registers, TRK8_REGISTER_SP, registers_get(*registers, TRK8_REGISTER_SP) + 1);
 
     return true;
 }

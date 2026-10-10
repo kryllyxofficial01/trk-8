@@ -4,11 +4,12 @@
 
 int main(void) {
     uint8_t program[] = {
-        0b10001011, 0b00000100,             // mov %f, 4
-        0b11000000, 0b00001000, 0b00000000, // lda 0b0000000000001000
-        0b00001010,                         // bze
-        0b10000001, 0b00010011,             // mov %a, 19
-        0b10000011, 0b00010001,             // mov %b, 17
+        0b10000001, 0b00001010, // mov %a, 10
+        0b10000011, 0b00010100, // mov %b, 20
+        0b00000010,             // adc
+        0b01100011,             // push %x
+        0b01110010,             // pop %c
+        0b00001011              // hlt
     };
 
     uint16_t program_length = sizeof(program) / sizeof(uint8_t);
@@ -18,6 +19,8 @@ int main(void) {
     memory_load_program(&machine.memory, program, program_length);
 
     machine_run(&machine);
+
+    machine_print_state(machine.state);
 
     return EXIT_SUCCESS;
 }
