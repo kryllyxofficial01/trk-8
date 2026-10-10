@@ -1,6 +1,7 @@
 ============================= Instruction Set =============================
 nop         : No OPeration
 mov r, r/i8 : MOVe [ r = r/i8 ]
+lda i16     : LoaD Address [ al,ah = i16 ]
 stb r/i8    : STore Byte [ r/i8 -> al,ah ]
 ldb r       : LoaD Byte [ al,ah -> r ]
 push r/i8   : PUSH to stack [ sp-- = r/i8 ]
@@ -23,9 +24,10 @@ hlt         : HaLT
 
 Opcode global bit mapping: CCAAAAAA
     CC = 2 bits indicating which category the instruction belongs to
-        no operands  = 0b00
-        one operand  = 0b01
-        two operands = 0b10
+        no operands        = 0b00
+        one operand        = 0b01
+        two operands       = 0b10
+        has 16-bit operand = 0b11
 
     AAAAAA = 6 bits for the respective arguments of each category
 
@@ -98,6 +100,13 @@ TWO OPERANDS
 
             8-bit immediate = 0b1
                 XXXXXXXX = 8 bits for an immediate value
+
+HAS 16-BIT OPERAND
+    11IIIIII XXXXXXXX XXXXXXXX
+        IIIIII = 6 bits for the instruction index
+            lda = 0b000000
+
+        XXXXXXXX XXXXXXXX = 16 bits for an immediate value
 
 * special value indicating that the byte following the opcode is
   an 8-bit immediate

@@ -27,9 +27,17 @@ static inline trk8_opcode_t parse_opcode(const uint8_t opcode) {
         case TRK8_OPCODE_CATEGORY_TWO_OPERANDS: {
             instruction_opcode.instruction_id.two_operands_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK);
 
-            instruction_opcode.register_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK);;
+            instruction_opcode.register_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_DESTINATION_REGISTER_ID_MASK);
 
             instruction_opcode.has_immediate_operand = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_TWO_OPERANDS_HAS_IMMEDIATE_OPERAND_MASK);
+
+            break;
+        }
+
+        case TRK8_OPCODE_CATEGORY_HAS_16BIT_OPERAND: {
+            instruction_opcode.instruction_id.has_16bit_operand_id = TRK8_OPCODE_EXTRACT_BIT_FIELD(opcode, TRK8_OPCODE_HAS_16BIT_OPERAND_INSTRUCTION_ID_MASK);
+
+            instruction_opcode.has_immediate_operand = true;
 
             break;
         }
@@ -62,6 +70,16 @@ static inline void execute_opcode(trk8_machine_t* machine, const trk8_opcode_t o
 
         case TRK8_OPCODE_CATEGORY_TWO_OPERANDS: {
             execute_two_operands_opcode(
+                &machine->state.registers,
+                &machine->memory,
+                opcode
+            );
+
+            break;
+        }
+
+        case TRK8_OPCODE_CATEGORY_HAS_16BIT_OPERAND: {
+            execute_has_16bit_operand_opcode(
                 &machine->state.registers,
                 &machine->memory,
                 opcode

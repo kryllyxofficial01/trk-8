@@ -31,6 +31,12 @@ void execute_two_operands_opcode(trk8_registers_t* registers, trk8_memory_t* mem
     }
 }
 
+void execute_has_16bit_operand_opcode(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_opcode_t opcode) {
+    switch (opcode.instruction_id.has_16bit_operand_id) {
+        case TRK8_INSTRUCTION_ID_LDA: instruction_lda(registers, memory); break;
+    }
+}
+
 void instruction_nop(trk8_registers_t* registers, trk8_memory_t* memory) {
     __asm__ __volatile__ ("nop");
 }
@@ -46,6 +52,16 @@ void instruction_mov(trk8_registers_t* registers, trk8_memory_t* memory, const t
     else {
         registers_set(registers, destination_register_id, registers_get(*registers, source));
     }
+}
+
+void instruction_lda(trk8_registers_t* registers, trk8_memory_t* memory) {
+    registers_increment_pc(registers, 1);
+
+    registers_set(registers, TRK8_REGISTER_AL, memory_read_byte(*memory, registers_get_pc_word(*registers)));
+
+    registers_increment_pc(registers, 1);
+
+    registers_set(registers, TRK8_REGISTER_AH, memory_read_byte(*memory, registers_get_pc_word(*registers)));
 }
 
 void instruction_stb(trk8_registers_t* registers, trk8_memory_t* memory, const trk8_register_id_t register_id, const bool has_immediate_operand) {

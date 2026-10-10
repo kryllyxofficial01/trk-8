@@ -25,6 +25,10 @@
     #define TRK8_OPCODE_TWO_OPERANDS_INSTRUCTION_ID_MASK (0b00100000)
 #endif
 
+#ifndef TRK8_OPCODE_HAS_16BIT_OPERAND_INSTRUCTION_ID_MASK
+    #define TRK8_OPCODE_HAS_16BIT_OPERAND_INSTRUCTION_ID_MASK (0b00111111)
+#endif
+
 #ifndef TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK
     #define TRK8_OPCODE_ONE_OPERAND_SOURCE_REGISTER_ID_MASK (0b00001111)
 #endif
@@ -44,7 +48,8 @@
 typedef enum _TRK8_OPCODE_CATEGORY {
     TRK8_OPCODE_CATEGORY_NO_OPERANDS,
     TRK8_OPCODE_CATEGORY_ONE_OPERAND,
-    TRK8_OPCODE_CATEGORY_TWO_OPERANDS
+    TRK8_OPCODE_CATEGORY_TWO_OPERANDS,
+    TRK8_OPCODE_CATEGORY_HAS_16BIT_OPERAND
 } trk8_opcode_category_t;
 
 enum __attribute__((packed)) _TRK8_INSTRUCTION_ID_NO_OPERANDS {
@@ -72,6 +77,10 @@ enum __attribute__((packed)) _TRK8_INSTRUCTION_ID_TWO_OPERANDS {
     TRK8_INSTRUCTION_ID_MOV
 };
 
+enum __attribute__((packed)) _TRK8_INSTRUCTION_ID_HAS_16BIT_OPERAND {
+    TRK8_INSTRUCTION_ID_LDA
+};
+
 typedef struct _TRK8_OPCODE {
     trk8_opcode_category_t category;
 
@@ -79,6 +88,7 @@ typedef struct _TRK8_OPCODE {
         enum _TRK8_INSTRUCTION_ID_NO_OPERANDS no_operands_id;
         enum _TRK8_INSTRUCTION_ID_ONE_OPERAND one_operand_id;
         enum _TRK8_INSTRUCTION_ID_TWO_OPERANDS two_operands_id;
+        enum _TRK8_INSTRUCTION_ID_HAS_16BIT_OPERAND has_16bit_operand_id;
     } instruction_id;
 
     trk8_register_id_t register_id;

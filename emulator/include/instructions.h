@@ -20,7 +20,8 @@
     #define TRK8_EXECUTE_OPCODE_CATEGORIES(_decl, ...) \
         _decl(no_operands, __VA_ARGS__); \
         _decl(one_operand, __VA_ARGS__); \
-        _decl(two_operands, __VA_ARGS__)
+        _decl(two_operands, __VA_ARGS__); \
+        _decl(has_16bit_operand, __VA_ARGS__)
 #endif
 
 #ifndef TRK8_INSTRUCTIONS_NO_OPERANDS
@@ -49,6 +50,11 @@
 #ifndef TRK8_INSTRUCTIONS_TWO_OPERANDS
     #define TRK8_INSTRUCTIONS_TWO_OPERANDS(_decl, ...) \
         _decl(mov, __VA_ARGS__)
+#endif
+
+#ifndef TRK8_INSTRUCTIONS_HAS_16BIT_OPERAND
+    #define TRK8_INSTRUCTIONS_HAS_16BIT_OPERAND(_decl, ...) \
+        _decl(lda, __VA_ARGS__)
 #endif
 
 TRK8_EXECUTE_OPCODE_CATEGORIES(
@@ -82,6 +88,13 @@ TRK8_INSTRUCTIONS_TWO_OPERANDS(
     trk8_memory_t* memory,
     const trk8_register_id_t destination_register_id,
     const bool has_immediate_operand
+);
+
+TRK8_INSTRUCTIONS_HAS_16BIT_OPERAND(
+    TRK8_INSTRUCTION_DECL,
+
+    trk8_registers_t* registers,
+    trk8_memory_t* memory
 );
 
 #endif
