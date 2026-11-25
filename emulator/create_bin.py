@@ -14,5 +14,5 @@ program = bytes([
     0b00001011                          # hlt
 ])
 
-with open("program.trk8", "wb") as f:
+with open("program.trk8.bin", "wb") as f:
     f.write(program)
