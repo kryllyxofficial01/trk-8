@@ -111,6 +111,8 @@ static bool parse_line(const char* line, trk8_assembly_line_t* asm_line, bool* h
 
     asm_line->mnemonic = duplicate_string_span(line_start, scan_ptr);
 
+    to_lowercase(asm_line->mnemonic);
+
     if (!asm_line->mnemonic) {
         free_asm_line(asm_line);
 

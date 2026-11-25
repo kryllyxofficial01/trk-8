@@ -1,11 +1,12 @@
 #ifndef __TRK8_UTILS_H
 #define __TRK8_UTILS_H
 
-#include <string.h>
 #include <ctype.h>
 
-void trim(char* string);
+#ifndef TRK8_MAX_BUFFER_LENGTH
+    #define TRK8_MAX_BUFFER_LENGTH (1024)
+#endif
 
-char* strsep(char** string, const char* delimiter);
+void to_lowercase(char* string);
 
 #endif
