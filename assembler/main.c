@@ -19,15 +19,5 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    for (uint16_t i = 0; i < line_count; i++) {
-        printf("%s\n", lines[i].mnemonic);
-
-        for (uint8_t j = 0; j < lines[i].operand_count; j++) {
-            printf("'%s'\n", lines[i].operands[j]);
-        }
-
-        printf("\n");
-    }
-
     return EXIT_SUCCESS;
 }
