@@ -1,2 +1,2 @@
-mov %a, !19
-mov %b, %a
+mov %a, !19 ; move 19 into "a" register
+mov %b, %a  ; move the value of "a" into the "b" register
