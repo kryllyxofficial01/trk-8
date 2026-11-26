@@ -1,23 +1,23 @@
 #include "include/assembler.h"
 
 trk8_instruction_info_t instructions_info[TRK8_INSTRUCTIONS_COUNT] = {
-    { .mnemonic = "nop", .byte_count = 1, .expected_operand_count = 0, .category_index = 1 },
-    { .mnemonic = "mov", .byte_count = 2, .expected_operand_count = 2, .category_index = 0 },
-    { .mnemonic = "lda", .byte_count = 3, .expected_operand_count = 1, .category_index = 0 },
-    { .mnemonic = "stb", .byte_count = 2, .expected_operand_count = 1, .category_index = 0 },
-    { .mnemonic = "ldb", .byte_count = 2, .expected_operand_count = 1, .category_index = 1 },
-    { .mnemonic = "push", .byte_count = 2, .expected_operand_count = 1, .category_index = 2 },
-    { .mnemonic = "pop", .byte_count = 2, .expected_operand_count = 1, .category_index = 3 },
-    { .mnemonic = "adc", .byte_count = 1, .expected_operand_count = 0, .category_index = 2 },
-    { .mnemonic = "and", .byte_count = 1, .expected_operand_count = 0, .category_index = 3 },
-    { .mnemonic = "or", .byte_count = 1, .expected_operand_count = 0, .category_index = 4 },
-    { .mnemonic = "not", .byte_count = 1, .expected_operand_count = 0, .category_index = 5 },
-    { .mnemonic = "cmp", .byte_count = 1, .expected_operand_count = 0, .category_index = 6 },
-    { .mnemonic = "jmp", .byte_count = 1, .expected_operand_count = 0, .category_index = 7 },
-    { .mnemonic = "bne", .byte_count = 1, .expected_operand_count = 0, .category_index = 8 },
-    { .mnemonic = "bca", .byte_count = 1, .expected_operand_count = 0, .category_index = 9 },
-    { .mnemonic = "bze", .byte_count = 1, .expected_operand_count = 0, .category_index = 10 },
-    { .mnemonic = "hlt", .byte_count = 1, .expected_operand_count = 0, .category_index = 11 }
+    { .mnemonic = "nop", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 1 },
+    { .mnemonic = "mov", .byte_count = 2, .category = TRK8_INSTRUCTION_CATEGORY_TWO_OPERANDS, .category_internal_index = 0 },
+    { .mnemonic = "lda", .byte_count = 3, .category = TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND, .category_internal_index = 0 },
+    { .mnemonic = "stb", .byte_count = 2, .category = TRK8_INSTRUCTION_CATEGORY_ONE_OPERAND, .category_internal_index = 0 },
+    { .mnemonic = "ldb", .byte_count = 2, .category = TRK8_INSTRUCTION_CATEGORY_ONE_OPERAND, .category_internal_index = 1 },
+    { .mnemonic = "push", .byte_count = 2, .category = TRK8_INSTRUCTION_CATEGORY_ONE_OPERAND, .category_internal_index = 2 },
+    { .mnemonic = "pop", .byte_count = 2, .category = TRK8_INSTRUCTION_CATEGORY_ONE_OPERAND, .category_internal_index = 3 },
+    { .mnemonic = "adc", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 2 },
+    { .mnemonic = "and", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 3 },
+    { .mnemonic = "or", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 4 },
+    { .mnemonic = "not", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 5 },
+    { .mnemonic = "cmp", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 6 },
+    { .mnemonic = "jmp", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 7 },
+    { .mnemonic = "bne", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 8 },
+    { .mnemonic = "bca", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 9 },
+    { .mnemonic = "bze", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 10 },
+    { .mnemonic = "hlt", .byte_count = 1, .category = TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS, .category_internal_index = 11 }
 };
 
 trk8_register_index_t register_indices[TRK8_REGISTERS_COUNT] = {
@@ -169,22 +169,18 @@ static bool process_operand(const char* operand, trk8_operand_type_t* operand_ty
     return true;
 }
 
-static bool convert_to_bytecode(const trk8_assembly_line_t line, uint8_t** bytecode, uint8_t* byte_count) {
-    uint8_t expected_operand_count = 0;
-
-    uint8_t category_index = 0;
+static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* symbol_table, const uint16_t symbol_table_length, uint8_t** bytecode, uint8_t* byte_count) {
+    trk8_instruction_info_t instruction_info;
 
     for (uint8_t i = 0; i < TRK8_INSTRUCTIONS_COUNT; i++) {
         if (strcmp(instructions_info[i].mnemonic, line.mnemonic) == 0) {
-            expected_operand_count = instructions_info[i].expected_operand_count;
-
-            category_index = instructions_info[i].category_index;
+            instruction_info = instructions_info[i];
 
             break;
         }
     }
 
-    if (expected_operand_count != line.operand_count) {
+    if (instruction_info.category != line.operand_count) {
         fprintf(stderr, "error: mismatching operand count\n");
 
         return false;
@@ -194,37 +190,75 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, uint8_t** bytec
         (*bytecode)[i] = 0;
     }
 
-    *byte_count = 0;
+    *byte_count = 1;
 
-    if (line.operand_count == 0) {
-        (*bytecode)[0] = category_index;
+    switch (instruction_info.category) {
+        case TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS: {
+            (*bytecode)[0] = instruction_info.category_internal_index;
 
-        (*byte_count)++;
-    }
-    else if (line.operand_count == 1) {
-        trk8_operand_type_t operand_type;
-        uint16_t operand_value = 0;
-
-        if (!process_operand(line.operands[0], &operand_type, &operand_value)) {
-            fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
-
-            return false;
+            break;
         }
 
-        uint8_t register_index = (operand_type == TRK8_OPERAND_TYPE_REGISTER) ? operand_value : TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE;
+        case TRK8_INSTRUCTION_CATEGORY_ONE_OPERAND: {
+            trk8_operand_type_t operand_type;
+            uint16_t operand_value = 0;
 
-        (*bytecode)[0] = 0b01000000 | (category_index << 4) | register_index;
+            if (!process_operand(line.operands[0], &operand_type, &operand_value)) {
+                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
 
-        (*byte_count)++;
+                return false;
+            }
 
-        if (register_index == TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE) {
-            (*bytecode)[1] = (uint8_t) operand_value;
+            uint8_t register_index = (operand_type == TRK8_OPERAND_TYPE_REGISTER) ? operand_value : TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE;
+
+            (*bytecode)[0] = (instruction_info.category << 6) | (instruction_info.category_internal_index << 4) | register_index;
+
+            if (register_index == TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE) {
+                (*bytecode)[1] = (uint8_t) operand_value;
+            }
+            else {
+                (*bytecode)[1] = TRK8_PADDING_BYTE;
+            }
 
             (*byte_count)++;
-        }
-    }
-    else if (line.operand_count == 2) {
 
+            break;
+        }
+
+        case TRK8_INSTRUCTION_CATEGORY_TWO_OPERANDS: {
+            trk8_operand_type_t first_operand_type;
+            uint16_t first_operand_value = 0;
+
+            if (!process_operand(line.operands[0], &first_operand_type, &first_operand_value)) {
+                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+
+                return false;
+            }
+
+            if (first_operand_type != TRK8_OPERAND_TYPE_REGISTER) {
+                fprintf(stderr, "error: first operand must be a register\n");
+            }
+
+            trk8_operand_type_t second_operand_type;
+            uint16_t second_operand_value = 0;
+
+            if (!process_operand(line.operands[1], &second_operand_type, &second_operand_value)) {
+                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+
+                return false;
+            }
+
+            (*bytecode)[0] = (instruction_info.category << 6) | (instruction_info.category_internal_index << 5) | (first_operand_value << 1) | (second_operand_type != TRK8_OPERAND_TYPE_REGISTER);
+            (*bytecode)[1] = (uint8_t) second_operand_value;
+
+            (*byte_count)++;
+
+            break;
+        }
+
+        case TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND: {
+            break;
+        }
     }
 
     return true;
@@ -376,12 +410,10 @@ bool assembler_run_pass2(trk8_pass1_result_t* pass1_result, uint8_t** output, ui
     for (uint16_t i = 0; i < pass1_result->ir_line_count; i++) {
         trk8_ir_line_t* ir = &pass1_result->ir_lines[i];
 
-        trk8_assembly_line_t* line = ir->source;
-
         uint8_t* bytes = calloc(TRK8_INSTRUCTIONS_MAX_BYTE_COUNT, sizeof(uint8_t));
         uint8_t byte_count = 0;
 
-        if (!convert_to_bytecode(*line, &bytes, &byte_count)) {
+        if (!convert_to_bytecode(*ir->source, pass1_result->symbol_table, pass1_result->symbol_table_length, &bytes, &byte_count)) {
             free(program);
 
             free(bytes);

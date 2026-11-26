@@ -27,14 +27,24 @@
     #define TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE (0b1111)
 #endif
 
+#ifndef TRK8_PADDING_BYTE
+    #define TRK8_PADDING_BYTE (0b00000001)
+#endif
+
+typedef enum _TRK8_INSTRUCTION_CATEGORY {
+    TRK8_INSTRUCTION_CATEGORY_NO_OPERANDS,
+    TRK8_INSTRUCTION_CATEGORY_ONE_OPERAND,
+    TRK8_INSTRUCTION_CATEGORY_TWO_OPERANDS,
+    TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND
+} trk8_instruction_category_t;
+
 typedef struct _TRK8_INSTRUCTION_INFO {
     char* mnemonic;
 
     uint8_t byte_count;
 
-    uint8_t expected_operand_count;
-
-    uint8_t category_index;
+    trk8_instruction_category_t category;
+    uint8_t category_internal_index;
 } trk8_instruction_info_t;
 
 typedef enum _TRK8_OPERAND_TYPE {

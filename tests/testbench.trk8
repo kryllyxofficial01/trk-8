@@ -1,1 +1,8 @@
-push %c
+label1:
+    push !19
+
+label2:
+    mov %b, !17
+
+label3:
+    pop %c

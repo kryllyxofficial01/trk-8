@@ -70,8 +70,6 @@ ONE OPERAND
         XXXXXXXX = 8 bits for first operand
             unused unless RRRR indicates the usage of an immediate value
 
-0b01101111
-
 TWO OPERANDS
     Opcode bit mapping: 10IRRRRV XXXXXXXX
         I = 1 bit for the instruction index

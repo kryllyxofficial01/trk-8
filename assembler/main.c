@@ -28,6 +28,12 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    for (uint16_t i = 0; i < pass1_result.symbol_table_length; i++) {
+        printf("[0x%04x] %s\n", pass1_result.symbol_table[i].address, pass1_result.symbol_table[i].name);
+    }
+
+    printf("\n");
+
     uint8_t* output;
     uint16_t output_byte_count = 0;
 
