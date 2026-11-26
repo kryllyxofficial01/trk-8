@@ -1,0 +1,186 @@
+; sieve of Eratosthenes for all primes under 100
+;   - all addresses 0x8100 + n are marked by a 1 if n is prime
+;   - all prime values are stored starting at 0x8200
+
+init_sieve:
+    mov %c, !0
+
+clear_loop:
+    mov %a, %c
+    mov %b, !101
+    cmp
+
+    lda .mark_0_1
+    bze
+
+    lda !0x8100
+
+    mov %a, %al
+    mov %b, %c
+    adc
+
+    mov %al, %x
+    stb !1
+
+    mov %a, %c
+    mov %b, !1
+    adc
+
+    mov %c, %x
+
+    lda .clear_loop
+    jmp
+
+mark_0_1:
+    lda !0x8100
+    stb !0
+
+    lda !0x8101
+    stb !0
+
+    mov %c, !2
+
+outer_loop:
+    mov %a, %c
+    mov %b, !11
+    cmp
+
+    lda .collect_primes
+    bze
+
+    lda !0x8100
+    mov %a, %al
+    mov %b, %c
+    adc
+
+    mov %al, %x
+
+    ldb %a
+
+    mov %b, !1
+    cmp
+
+    lda .next_p
+    bne
+
+    mov %a, %c
+    mov %b, %c
+    adc
+
+    push %x
+
+mark_multiples:
+    pop %x
+
+
+    mov %a, %x
+    mov %b, !155
+    mov %f, !0
+    adc
+
+    lda .next_p
+    bca
+
+    mov %a, %x
+    mov %b, !101
+    mov %f, !0
+    adc
+
+    push %x
+
+    lda !0x8100
+
+    mov %a, %al
+
+    pop %b
+    push %b
+
+    mov %f, !0
+    adc
+
+    mov %al, %x
+
+    stb !0
+
+    pop %a
+    mov %b, %c
+    mov %f, !0
+    adc
+
+    push %x
+
+    lda .mark_multiples
+    jmp
+
+next_p:
+    mov %a, %c
+    mov %b, !1
+    adc
+
+    mov %c, %x
+
+    lda .outer_loop
+    jmp
+
+collect_primes:
+    mov %c, !2
+
+    mov %b, !0
+    push %b
+
+scan_primes:
+    mov %a, %c
+    mov %b, !101
+    cmp
+
+    lda .done
+    bze
+
+    lda !0x8100
+
+    mov %a, %al
+    mov %b, %c
+    adc
+
+    mov %al, %x
+
+    ldb %a
+
+    mov %b, !1
+    cmp
+
+    lda .skip_prime
+    bne
+
+    pop %b
+    push %b
+
+    lda !0x8200
+
+    mov %a, %al
+    adc
+
+    mov %al, %x
+
+    stb %c
+
+    pop %a
+    mov %b, !1
+    adc
+
+    push %x
+
+skip_prime:
+    mov %a, %c
+    mov %b, !1
+    adc
+
+    mov %c, %x
+
+    lda .scan_primes
+    jmp
+
+done:
+    pop %a
+
+    hlt
