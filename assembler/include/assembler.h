@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include "asm_line.h"
 #include "utils.h"
@@ -13,6 +14,41 @@
 #ifndef TRK8_INSTRUCTIONS_COUNT
     #define TRK8_INSTRUCTIONS_COUNT (17)
 #endif
+
+#ifndef TRK8_REGISTERS_COUNT
+    #define TRK8_REGISTERS_COUNT (10)
+#endif
+
+#ifndef TRK8_INSTRUCTIONS_MAX_BYTE_COUNT
+    #define TRK8_INSTRUCTIONS_MAX_BYTE_COUNT (3)
+#endif
+
+#ifndef TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE
+    #define TRK8_ONE_OPERAND_INSTRUCTION_HAS_IMMEDIATE (0b1111)
+#endif
+
+typedef struct _TRK8_INSTRUCTION_INFO {
+    char* mnemonic;
+
+    uint8_t byte_count;
+
+    uint8_t expected_operand_count;
+
+    uint8_t category_index;
+} trk8_instruction_info_t;
+
+typedef enum _TRK8_OPERAND_TYPE {
+    TRK8_OPERAND_TYPE_REGISTER,
+    TRK8_OPERAND_TYPE_IMM8,
+    TRK8_OPERAND_TYPE_IMM16,
+    TRK8_OPERAND_TYPE_LABEL
+} trk8_operand_type_t;
+
+typedef struct _TRK8_REGISTER_INDEX {
+    char* symbolic_name;
+
+    uint8_t index;
+} trk8_register_index_t;
 
 typedef struct _TRK8_IMMEDIATE_REPRESENTATION_LINE {
     uint16_t address;
@@ -36,13 +72,8 @@ typedef struct _TRK8_PASS1_RESULT {
     uint16_t symbol_table_length;
 } trk8_pass1_result_t;
 
-typedef struct _TRK8_INSTRUCTION_BYTE_INFO {
-    char* mnemonic;
-
-    uint8_t byte_count;
-} trk8_instruction_byte_info_t;
-
 bool assembler_run_pass1(trk8_assembly_line_t* lines, const uint16_t line_count, const uint16_t origin_address, trk8_pass1_result_t* pass1_result);
+bool assembler_run_pass2(trk8_pass1_result_t* pass1_result, uint8_t** output, uint16_t* output_byte_count);
 
 void assembler_free_pass1_result(trk8_pass1_result_t* pass1_result);
 

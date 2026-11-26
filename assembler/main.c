@@ -23,18 +23,25 @@ int main(int argc, char* argv[]) {
     trk8_pass1_result_t pass1_result;
 
     if (!assembler_run_pass1(lines, line_count, 0x0000, &pass1_result)) {
-        fprintf(stderr, "Failed to assemble '%s'\n", argv[1]);
+        fprintf(stderr, "Failed to assemble '%s' on first pass\n", argv[1]);
 
         return EXIT_FAILURE;
     }
 
-    for (uint16_t i = 0; i < pass1_result.symbol_table_length; i++) {
-        printf(
-            "%s -> 0x%04X\n",
-            pass1_result.symbol_table[i].name,
-            (unsigned int) pass1_result.symbol_table[i].address
-        );
+    uint8_t* output;
+    uint16_t output_byte_count = 0;
+
+    if (!assembler_run_pass2(&pass1_result, &output, &output_byte_count)) {
+        fprintf(stderr, "Failed to assemble '%s' on second pass\n", argv[1]);
+
+        return EXIT_FAILURE;
     }
+
+    for (uint16_t i = 0; i < output_byte_count; i++) {
+        printf("0x%02x\n", output[i]);
+    }
+
+    free(output);
 
     return EXIT_SUCCESS;
 }

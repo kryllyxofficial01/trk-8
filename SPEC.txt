@@ -47,7 +47,7 @@ NO OPERANDS
             hlt = 0b001011
 
 ONE OPERAND
-    Opcode bit mapping: 01IIRRRR
+    Opcode bit mapping: 01IIRRRR XXXXXXXX
         II = 2 bits for the instruction index
             stb  = 0b00
             ldb  = 0b01
@@ -66,6 +66,11 @@ ONE OPERAND
             pcl   = 0b1000
             pch   = 0b1001
             imm8* = 0b1111
+
+        XXXXXXXX = 8 bits for first operand
+            unused unless RRRR indicates the usage of an immediate value
+
+0b01101111
 
 TWO OPERANDS
     Opcode bit mapping: 10IRRRRV XXXXXXXX

@@ -1,9 +1,1 @@
-label1:
-    mov %a, !19
-
-    lda .label2
-
-label2:
-    mov %b, !17
-
-    lda .label1
+push %c
