@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "include/machine.h"
 
@@ -47,8 +48,22 @@ static inline uint8_t* load_file(const char* filename, uint16_t* program_length)
 }
 
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s <path to binary file>\n", argv[0]);
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <path to binary file> --ps/--nps\n", argv[0]);
+
+        return EXIT_FAILURE;
+    }
+
+    bool print_stack;
+
+    if (strcmp(argv[2], "--ps") == 0) {
+        print_stack = true;
+    }
+    else if (strcmp(argv[2], "--nps") == 0) {
+        print_stack = false;
+    }
+    else {
+        fprintf(stderr, "Invalid argument '%s'\n", argv[2]);
 
         return EXIT_FAILURE;
     }
@@ -67,7 +82,7 @@ int main(int argc, char* argv[]) {
 
     machine_run(&machine);
 
-    machine_print_state(machine.state);
+    machine_print_state(machine, print_stack);
 
     return EXIT_SUCCESS;
 }

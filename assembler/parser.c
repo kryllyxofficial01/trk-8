@@ -40,7 +40,7 @@ static bool add_operand(trk8_assembly_line_t* line, const char* span_start, cons
     }
 
     if (line->operand_count >= TRK8_INSTRUCTION_MAX_OPERANDS) {
-        fprintf(stderr, "error: extra operand '%s'\n", operand);
+        fprintf(stderr, "error: extra operand '%s' (line %u)\n", operand, line->line_number);
 
         free(operand);
 
@@ -83,7 +83,11 @@ static void free_asm_lines(trk8_assembly_line_t* lines, uint16_t count) {
 }
 
 static bool parse_line(const char* line, trk8_assembly_line_t* asm_line, bool* has_content) {
+    uint16_t line_number = asm_line->line_number;
+
     memset(asm_line, 0, sizeof(*asm_line));
+
+    asm_line->line_number = line_number;
 
     *has_content = false;
 
@@ -175,8 +179,12 @@ bool parser_parse_file(const char* filepath, trk8_assembly_line_t** lines, uint1
 
     char buffer[TRK8_MAX_BUFFER_LENGTH];
 
+    uint16_t line_number = 1;
+
     while (fgets(buffer, sizeof(buffer), file) != NULL) {
         trk8_assembly_line_t current_line;
+
+        current_line.line_number = line_number;
 
         bool has_content = false;
 
@@ -189,6 +197,8 @@ bool parser_parse_file(const char* filepath, trk8_assembly_line_t** lines, uint1
         }
 
         if (!has_content) {
+            line_number++;
+
             continue;
         }
 
@@ -228,6 +238,8 @@ bool parser_parse_file(const char* filepath, trk8_assembly_line_t** lines, uint1
         }
 
         parsed_lines[parsed_count++] = current_line;
+
+        line_number++;
     }
 
     if (ferror(file)) {

@@ -1,25 +1,4 @@
-mov %a, !19
-not
-mov %a, %x
-mov %b, !1
-adc
-
-mov %b, %x
-mov %a, !17
+mov %a, !8
+mov %b, !0xff ; twos-complement of 1, used for subtracting 1
 
 adc
-
-lda .label2
-bne
-
-label1:
-    mov %a, %x
-
-    lda .label3
-    jmp
-
-label2:
-    mov %c, !42
-
-label3:
-    mov %b, %a

@@ -54,7 +54,7 @@ static uint8_t get_register_index(const char* register_name) {
         }
     }
 
-    return -1;
+    return UINT8_MAX;
 }
 
 static bool add_symbol_table_entry(trk8_symbol_t** table, uint16_t* table_length, uint16_t* table_capacity, const trk8_symbol_t symbol) {
@@ -109,6 +109,10 @@ static bool add_symbol_table_entry(trk8_symbol_t** table, uint16_t* table_length
 }
 
 static bool process_operand(const char* operand, const trk8_symbol_t* symbol_table, const uint16_t symbol_table_length, trk8_operand_type_t* operand_type, uint16_t* operand_value) {
+    if (!operand || *operand == '\0') {
+        return false;
+    }
+
     switch (*operand) {
         case '%': {
             operand++;
@@ -117,7 +121,7 @@ static bool process_operand(const char* operand, const trk8_symbol_t* symbol_tab
 
             *operand_value = get_register_index(operand);
 
-            if (*operand_value == -1) {
+            if (*operand_value == UINT8_MAX) {
                 return false;
             }
 
@@ -139,9 +143,6 @@ static bool process_operand(const char* operand, const trk8_symbol_t* symbol_tab
                     base = 16;
 
                     operand += 2;
-                }
-                else {
-                    return false;
                 }
             }
 
@@ -174,12 +175,20 @@ static bool process_operand(const char* operand, const trk8_symbol_t* symbol_tab
 
             *operand_type = TRK8_OPERAND_TYPE_LABEL;
 
+            bool symbol_exists = false;
+
             for (uint16_t i = 0; i < symbol_table_length; i++) {
                 if (strcmp(symbol_table[i].name, operand) == 0) {
                     *operand_value = symbol_table[i].address;
 
+                    symbol_exists = true;
+
                     break;
                 }
+            }
+
+            if (!symbol_exists) {
+                return false;
             }
 
             break;
@@ -203,12 +212,12 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
     }
 
     if (instruction_info.category != line.operand_count && instruction_info.category != TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND) {
-        fprintf(stderr, "error: mismatching operand count\n");
+        fprintf(stderr, "error: mismatching operand count (line %u)\n", line.line_number);
 
         return false;
     }
     else if (instruction_info.category == TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND && line.operand_count != 1) {
-        fprintf(stderr, "error: mismatching operand count\n");
+        fprintf(stderr, "error: mismatching operand count (line %u)\n", line.line_number);
 
         return false;
     }
@@ -231,7 +240,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             uint16_t operand_value = 0;
 
             if (!process_operand(line.operands[0], symbol_table, symbol_table_length, &operand_type, &operand_value)) {
-                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+                fprintf(stderr, "error: unable to process operand '%s' (line %u)\n", line.operands[0], line.line_number);
 
                 return false;
             }
@@ -257,7 +266,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             uint16_t first_operand_value = 0;
 
             if (!process_operand(line.operands[0], symbol_table, symbol_table_length, &first_operand_type, &first_operand_value)) {
-                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+                fprintf(stderr, "error: unable to process operand '%s' (line %u)\n", line.operands[0], line.line_number);
 
                 return false;
             }
@@ -270,7 +279,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             uint16_t second_operand_value = 0;
 
             if (!process_operand(line.operands[1], symbol_table, symbol_table_length, &second_operand_type, &second_operand_value)) {
-                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[1]);
+                fprintf(stderr, "error: unable to process operand '%s' (line %u)\n", line.operands[1], line.line_number);
 
                 return false;
             }
@@ -288,13 +297,13 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             uint16_t operand_value = 0;
 
             if (!process_operand(line.operands[0], symbol_table, symbol_table_length, &operand_type, &operand_value)) {
-                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+                fprintf(stderr, "error: unable to process operand '%s' (line %u)\n", line.operands[0], line.line_number);
 
                 return false;
             }
 
             if (operand_type == TRK8_OPERAND_TYPE_REGISTER) {
-                fprintf(stderr, "error: operand cannot be a register '%s'\n", line.operands[0]);
+                fprintf(stderr, "error: operand cannot be a register '%s' (line %u)\n", line.operands[0], line.line_number);
 
                 return false;
             }
@@ -415,7 +424,7 @@ bool assembler_run_pass1(trk8_assembly_line_t* lines, const uint16_t line_count,
         uint8_t byte_count = get_instruction_byte_count(*line);
 
         if (byte_count == 0) {
-            fprintf(stderr, "error: unknown mnemonic '%s'\n", line->mnemonic);
+            fprintf(stderr, "error: unknown mnemonic '%s' (line %u)\n", line->mnemonic, line->line_number);
 
             assembler_free_pass1_result(pass1_result);
 
@@ -423,7 +432,7 @@ bool assembler_run_pass1(trk8_assembly_line_t* lines, const uint16_t line_count,
         }
 
         if (location_counter > UINT16_MAX - byte_count) {
-            fprintf(stderr, "error: address overflow\n");
+            fprintf(stderr, "error: address overflow (line %u)\n", line->line_number);
 
             assembler_free_pass1_result(pass1_result);
 

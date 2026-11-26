@@ -52,6 +52,6 @@ void memory_write_byte(trk8_memory_t* memory, const uint16_t address, const uint
 
 void memory_dump(const trk8_memory_t memory, const uint16_t start_address, const uint16_t end_address) {
     for (uint16_t i = start_address; i <= end_address; i++) {
-        printf("[0x%02x]= 0x%02x\n", i, memory_read_byte(memory, i));
+        printf("[0x%04x] %u\n", i, memory_read_byte(memory, i));
     }
 }
