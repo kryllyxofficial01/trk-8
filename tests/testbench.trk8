@@ -1,8 +1,10 @@
-label1:
-    push !19
+mov %a, !17
+not
+mov %a, %x
+mov %b, !1
+adc
 
-label2:
-    mov %b, !17
+mov %b, %x
+mov %a, !19
 
-label3:
-    pop %c
+adc

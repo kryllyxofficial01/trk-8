@@ -117,6 +117,10 @@ static bool process_operand(const char* operand, trk8_operand_type_t* operand_ty
 
             *value = get_register_index(operand);
 
+            if (*value == -1) {
+                return false;
+            }
+
             break;
         }
 
@@ -164,6 +168,8 @@ static bool process_operand(const char* operand, trk8_operand_type_t* operand_ty
 
             break;
         }
+
+        default: return false;
     }
 
     return true;
@@ -180,7 +186,12 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
         }
     }
 
-    if (instruction_info.category != line.operand_count) {
+    if (instruction_info.category != line.operand_count && instruction_info.category != TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND) {
+        fprintf(stderr, "error: mismatching operand count\n");
+
+        return false;
+    }
+    else if (instruction_info.category == TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND && line.operand_count != 1) {
         fprintf(stderr, "error: mismatching operand count\n");
 
         return false;
@@ -243,7 +254,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             uint16_t second_operand_value = 0;
 
             if (!process_operand(line.operands[1], &second_operand_type, &second_operand_value)) {
-                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[1]);
 
                 return false;
             }
@@ -257,6 +268,27 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
         }
 
         case TRK8_INSTRUCTION_CATEGORY_HAS_16BIT_OPERAND: {
+            trk8_operand_type_t operand_type;
+            uint16_t operand_value = 0;
+
+            if (!process_operand(line.operands[0], &operand_type, &operand_value)) {
+                fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
+
+                return false;
+            }
+
+            if (operand_type == TRK8_OPERAND_TYPE_REGISTER) {
+                fprintf(stderr, "error: operand cannot be a register '%s'\n", line.operands[0]);
+
+                return false;
+            }
+
+            (*bytecode)[0] = (instruction_info.category << 6) | instruction_info.category_internal_index;
+            (*bytecode)[1] = operand_value & 0xff;
+            (*bytecode)[2] = (operand_value >> 8) & 0xff;
+
+            (*byte_count) += 2;
+
             break;
         }
     }

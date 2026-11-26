@@ -48,7 +48,7 @@ static inline uint8_t* load_file(const char* filename, uint16_t* program_length)
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        fprintf(stderr, "Usage: %s <path to .trk8 file>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <path to binary file>\n", argv[0]);
 
         return EXIT_FAILURE;
     }

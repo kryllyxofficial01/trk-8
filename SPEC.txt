@@ -110,6 +110,7 @@ HAS 16-BIT OPERAND
             lda = 0b000000
 
         XXXXXXXX XXXXXXXX = 16 bits for an immediate value
+            stored in little-endian format
 
 * special value indicating that the byte following the opcode is
   an 8-bit immediate
