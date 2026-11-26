@@ -108,16 +108,16 @@ static bool add_symbol_table_entry(trk8_symbol_t** table, uint16_t* table_length
     return true;
 }
 
-static bool process_operand(const char* operand, trk8_operand_type_t* operand_type, uint16_t* value) {
+static bool process_operand(const char* operand, const trk8_symbol_t* symbol_table, const uint16_t symbol_table_length, trk8_operand_type_t* operand_type, uint16_t* operand_value) {
     switch (*operand) {
         case '%': {
             operand++;
 
             *operand_type = TRK8_OPERAND_TYPE_REGISTER;
 
-            *value = get_register_index(operand);
+            *operand_value = get_register_index(operand);
 
-            if (*value == -1) {
+            if (*operand_value == -1) {
                 return false;
             }
 
@@ -158,12 +158,28 @@ static bool process_operand(const char* operand, trk8_operand_type_t* operand_ty
             if (raw_value <= UINT8_MAX) {
                 *operand_type = TRK8_OPERAND_TYPE_IMM8;
 
-                *value = (uint8_t) raw_value;
+                *operand_value = (uint8_t) raw_value;
             }
             else if (raw_value > UINT8_MAX) {
                 *operand_type = TRK8_OPERAND_TYPE_IMM16;
 
-                *value = (uint16_t) raw_value;
+                *operand_value = (uint16_t) raw_value;
+            }
+
+            break;
+        }
+
+        case '.': {
+            operand++;
+
+            *operand_type = TRK8_OPERAND_TYPE_LABEL;
+
+            for (uint16_t i = 0; i < symbol_table_length; i++) {
+                if (strcmp(symbol_table[i].name, operand) == 0) {
+                    *operand_value = symbol_table[i].address;
+
+                    break;
+                }
             }
 
             break;
@@ -214,7 +230,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             trk8_operand_type_t operand_type;
             uint16_t operand_value = 0;
 
-            if (!process_operand(line.operands[0], &operand_type, &operand_value)) {
+            if (!process_operand(line.operands[0], symbol_table, symbol_table_length, &operand_type, &operand_value)) {
                 fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
 
                 return false;
@@ -240,7 +256,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             trk8_operand_type_t first_operand_type;
             uint16_t first_operand_value = 0;
 
-            if (!process_operand(line.operands[0], &first_operand_type, &first_operand_value)) {
+            if (!process_operand(line.operands[0], symbol_table, symbol_table_length, &first_operand_type, &first_operand_value)) {
                 fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
 
                 return false;
@@ -253,7 +269,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             trk8_operand_type_t second_operand_type;
             uint16_t second_operand_value = 0;
 
-            if (!process_operand(line.operands[1], &second_operand_type, &second_operand_value)) {
+            if (!process_operand(line.operands[1], symbol_table, symbol_table_length, &second_operand_type, &second_operand_value)) {
                 fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[1]);
 
                 return false;
@@ -271,7 +287,7 @@ static bool convert_to_bytecode(const trk8_assembly_line_t line, trk8_symbol_t* 
             trk8_operand_type_t operand_type;
             uint16_t operand_value = 0;
 
-            if (!process_operand(line.operands[0], &operand_type, &operand_value)) {
+            if (!process_operand(line.operands[0], symbol_table, symbol_table_length, &operand_type, &operand_value)) {
                 fprintf(stderr, "error: unable to process operand '%s'\n", line.operands[0]);
 
                 return false;

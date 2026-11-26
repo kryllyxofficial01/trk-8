@@ -1,10 +1,25 @@
-mov %a, !17
+mov %a, !19
 not
 mov %a, %x
 mov %b, !1
 adc
 
 mov %b, %x
-mov %a, !19
+mov %a, !17
 
 adc
+
+lda .label2
+bne
+
+label1:
+    mov %a, %x
+
+    lda .label3
+    jmp
+
+label2:
+    mov %c, !42
+
+label3:
+    mov %b, %a
