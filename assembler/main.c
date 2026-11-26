@@ -71,6 +71,8 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
+    printf("Wrote %u bytes to '%s'\n", output_byte_count, argv[2]);
+
     free(output);
 
     return EXIT_SUCCESS;
