@@ -1,0 +1,4 @@
+mov %a, !8
+mov %b, !0xff ; twos-complement of 1, used for subtracting 1
+
+adc

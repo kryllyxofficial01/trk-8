@@ -53,7 +53,7 @@ void registers_set(trk8_registers_t* registers, const trk8_register_id_t registe
 
         case TRK8_REGISTER_SP: registers->sp = value; break;
 
-        case TRK8_REGISTER_F: registers->f = value & 0x0f; break; // only take low nibble
+        case TRK8_REGISTER_F: registers->f = value & 0x0f; break;
 
         case TRK8_REGISTER_AL: registers->al = value; break;
         case TRK8_REGISTER_AH: registers->ah = value; break;

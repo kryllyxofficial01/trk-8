@@ -1,0 +1,41 @@
+; calculates the first 10 Fibonacci numbers and pushes them to the stack
+
+push !0
+push !1
+
+mov %c, !8
+
+loop:
+    mov %a, %c
+    mov %b, !0
+
+    cmp
+
+    lda .done
+    bze
+
+    pop %b
+    pop %a
+
+    mov %f, !0
+
+    adc
+
+    push %a
+    push %b
+    push %x
+
+    mov %a, %c
+    mov %b, !0xff
+
+    mov %f, !0
+
+    adc
+
+    mov %c, %x
+
+    lda .loop
+    jmp
+
+done:
+    hlt

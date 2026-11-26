@@ -137,25 +137,35 @@ void machine_run(trk8_machine_t* machine) {
     }
 }
 
-void machine_print_state(const trk8_machine_state_t state) {
+void machine_print_state(const trk8_machine_t machine, bool print_stack) {
     printf("========== Registers ==========\n");
 
     printf(
         "a=%u, b=%u, c=%u, x=%u\nsp=%u, f=%u\nal=0x%02x, ah=0x%02x\npcl=0x%02x, pch=0x%02x\n",
-        registers_get(state.registers, TRK8_REGISTER_A),
-        registers_get(state.registers, TRK8_REGISTER_B),
-        registers_get(state.registers, TRK8_REGISTER_C),
-        registers_get(state.registers, TRK8_REGISTER_X),
+        registers_get(machine.state.registers, TRK8_REGISTER_A),
+        registers_get(machine.state.registers, TRK8_REGISTER_B),
+        registers_get(machine.state.registers, TRK8_REGISTER_C),
+        registers_get(machine.state.registers, TRK8_REGISTER_X),
 
-        registers_get(state.registers, TRK8_REGISTER_SP),
-        registers_get(state.registers, TRK8_REGISTER_F),
+        registers_get(machine.state.registers, TRK8_REGISTER_SP),
+        registers_get(machine.state.registers, TRK8_REGISTER_F),
 
-        registers_get(state.registers, TRK8_REGISTER_AL),
-        registers_get(state.registers, TRK8_REGISTER_AH),
+        registers_get(machine.state.registers, TRK8_REGISTER_AL),
+        registers_get(machine.state.registers, TRK8_REGISTER_AH),
 
-        registers_get(state.registers, TRK8_REGISTER_PCL),
-        registers_get(state.registers, TRK8_REGISTER_PCH)
+        registers_get(machine.state.registers, TRK8_REGISTER_PCL),
+        registers_get(machine.state.registers, TRK8_REGISTER_PCH)
     );
 
     printf("===============================\n");
+
+    if (print_stack) {
+        printf("\n=========== Stack ===========\n");
+
+        for (uint16_t i = TRK8_STACK_END; i >= TRK8_STACK_START; i--) {
+            printf("[0x%04x] %u\n", i, memory_read_byte(machine.memory, i));
+        }
+
+        printf("===============================\n");
+    }
 }

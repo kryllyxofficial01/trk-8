@@ -1,0 +1,120 @@
+; calculates the sequence according to the Collatz Conjecture (0 < n <= 20)
+
+mov %c, !13 ; input number
+
+; verify input is greater than 0
+mov %a, %c
+mov %b, !0
+cmp
+
+lda .invalid_input
+bze
+
+; verify input is less than or equal to 20
+mov %a, %c
+mov %b, !0xec
+mov %f, !0
+adc
+
+lda .invalid_input
+bca
+
+main_loop:
+    push %c
+
+    ; stop when "c" is equal to 1
+    mov %a, %c
+    mov %b, !1
+    cmp
+
+    lda .done
+    bze
+
+    ; check if "c" is even or odd
+    mov %a, %c
+    mov %b, !1
+    and
+
+    mov %a, %x
+    mov %b, !0
+    cmp
+
+    lda .even
+    bze
+
+odd:
+    ; adds "c" to itself, effectively 2 * "c"
+    mov %a, %c
+    mov %b, %c
+    mov %f, !0
+    adc
+
+    ; adds "c" to the previous addition, effectively 3 * "c"
+    mov %a, %x
+    mov %b, %c
+    mov %f, !0
+    adc
+
+    ; lastly, add 1 to the effective 3 * "c" evaluation
+    mov %a, %x
+    mov %b, !1
+    mov %f, !0
+    adc
+
+    mov %c, %x
+
+    lda .main_loop
+    jmp
+
+even:
+    mov %b, !0
+    mov %a, %c
+
+divide_by_2_loop:
+    push %b
+
+    ; check if remainder is 0
+    mov %b, !0
+    cmp
+
+    pop %b
+
+    lda .divide_by_2_done
+    bze
+
+    push %b
+
+    ; subtract 2 from remainder
+    mov %b, !0xfe
+    mov %f, !0
+    adc
+
+    mov %a, %x
+
+    pop %b
+
+    push %a
+
+    ; increment quotient by 1
+    mov %a, %b
+    mov %b, !1
+    mov %f, !0
+    adc
+
+    mov %b, %x
+
+    pop %a
+
+    lda .divide_by_2_loop
+    jmp
+
+divide_by_2_done:
+    mov %c, %b
+
+    lda .main_loop
+    jmp
+
+invalid_input:
+
+done:
+    hlt

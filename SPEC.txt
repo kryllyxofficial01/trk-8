@@ -47,7 +47,7 @@ NO OPERANDS
             hlt = 0b001011
 
 ONE OPERAND
-    Opcode bit mapping: 01IIRRRR
+    Opcode bit mapping: 01IIRRRR XXXXXXXX
         II = 2 bits for the instruction index
             stb  = 0b00
             ldb  = 0b01
@@ -66,6 +66,9 @@ ONE OPERAND
             pcl   = 0b1000
             pch   = 0b1001
             imm8* = 0b1111
+
+        XXXXXXXX = 8 bits for first operand
+            unused unless RRRR indicates the usage of an immediate value
 
 TWO OPERANDS
     Opcode bit mapping: 10IRRRRV XXXXXXXX
@@ -107,6 +110,7 @@ HAS 16-BIT OPERAND
             lda = 0b000000
 
         XXXXXXXX XXXXXXXX = 16 bits for an immediate value
+            stored in little-endian format
 
 * special value indicating that the byte following the opcode is
   an 8-bit immediate
