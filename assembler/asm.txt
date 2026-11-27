@@ -1,3 +1,0 @@
-pass #1
-    - creates "intermediate.txt" (file containing each line of assembly paired with its Location Counter address)
-    - creates "symbol_table.txt" (file containing each symbol and its starting location in memory)
